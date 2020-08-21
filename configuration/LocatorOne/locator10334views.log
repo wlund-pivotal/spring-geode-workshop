@@ -1,0 +1,54 @@
+
+[info 2020/08/20 18:27:06.516 PDT <main> tid=0x1] Log opened with new distributed system connection.  View[192.168.86.20(LocatorOne:13574:locator)<ec><v0>:41000|0] members: [192.168.86.20(LocatorOne:13574:locator)<ec><v0>:41000]
+
+[info 2020/08/20 18:27:28.401 PDT <DM-MemberEventInvoker> tid=0x18] A new member joined: 192.168.86.20(ServerOne:13703)<v1>:41001.  View[192.168.86.20(LocatorOne:13574:locator)<ec><v0>:41000|1] members: [192.168.86.20(LocatorOne:13574:locator)<ec><v0>:41000, 192.168.86.20(ServerOne:13703)<v1>:41001{lead}]
+
+[info 2020/08/20 18:28:05.934 PDT <P2P message reader for 192.168.86.20(ServerOne:13703)<v1>:41001 shared ordered uid=2 port=64167> tid=0x50] server count: 1 connected client count: 1 client subscription queue count: 1
+  current servers : 192.168.86.20(ServerOne:13703)<v1>:41001 
+
+[info 2020/08/20 19:46:01.681 PDT <P2P message reader for 192.168.86.20(ServerOne:13703)<v1>:41001 shared ordered uid=2 port=64167> tid=0x50] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:13703)<v1>:41001 
+
+[info 2020/08/20 20:46:14.430 PDT <P2P message reader for 192.168.86.20(ServerOne:13703)<v1>:41001 shared ordered uid=2 port=64167> tid=0x50] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:13703)<v1>:41001 
+
+[info 2020/08/20 21:02:48.442 PDT <main> tid=0x1] Log opened with new distributed system connection.  View[192.168.86.20(LocatorOne:15604:locator)<ec><v0>:41000|0] members: [192.168.86.20(LocatorOne:15604:locator)<ec><v0>:41000]
+
+[info 2020/08/20 21:03:03.485 PDT <DM-MemberEventInvoker> tid=0x18] A new member joined: 192.168.86.20(ServerOne:15687)<v1>:41001.  View[192.168.86.20(LocatorOne:15604:locator)<ec><v0>:41000|1] members: [192.168.86.20(LocatorOne:15604:locator)<ec><v0>:41000, 192.168.86.20(ServerOne:15687)<v1>:41001{lead}]
+
+[info 2020/08/20 21:03:59.813 PDT <P2P message reader for 192.168.86.20(ServerOne:15687)<v1>:41001 shared ordered uid=2 port=49452> tid=0x53] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15687)<v1>:41001 
+
+[info 2020/08/20 21:08:36.108 PDT <main> tid=0x1] Log opened with new distributed system connection.  View[192.168.86.20(LocatorOne:15812:locator)<ec><v0>:41000|0] members: [192.168.86.20(LocatorOne:15812:locator)<ec><v0>:41000]
+
+[info 2020/08/20 21:08:49.871 PDT <DM-MemberEventInvoker> tid=0x18] A new member joined: 192.168.86.20(ServerOne:15888)<v1>:41001.  View[192.168.86.20(LocatorOne:15812:locator)<ec><v0>:41000|1] members: [192.168.86.20(LocatorOne:15812:locator)<ec><v0>:41000, 192.168.86.20(ServerOne:15888)<v1>:41001{lead}]
+
+[info 2020/08/20 21:09:11.163 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/20 22:16:11.875 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/21 01:00:24.974 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/21 02:03:58.471 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/21 03:33:30.463 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/21 05:35:18.558 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/21 06:39:40.504 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/21 07:40:15.290 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/21 08:53:07.785 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 
+
+[info 2020/08/21 09:53:34.865 PDT <P2P message reader for 192.168.86.20(ServerOne:15888)<v1>:41001 shared ordered uid=2 port=49753> tid=0x52] server count: 1 connected client count: 0 client subscription queue count: 0
+  current servers : 192.168.86.20(ServerOne:15888)<v1>:41001 

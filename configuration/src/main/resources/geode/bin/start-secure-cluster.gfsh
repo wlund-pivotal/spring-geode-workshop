@@ -1,0 +1,10 @@
+# Gfsh shell script to start a secure GemFire/Geode cluster
+
+set variable --name=SBDG_HOME --value=/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/configuration
+
+set variable --name=CLASSPATH --value=${SBDG_HOME}/libs/apache-geode-extensions-1.4.0-SNAPSHOT.jar
+set variable --name=GEMFIRE_PROPERTIES --value=${SBDG_HOME}/src/main/resources/geode/config/gemfire.properties
+
+start locator --name=LocatorOne --classpath=${CLASSPATH} --properties-file=${GEMFIRE_PROPERTIES}
+connect --user=test --password=test
+start server --name=ServerOne --classpath=${CLASSPATH} --properties-file=${GEMFIRE_PROPERTIES}
