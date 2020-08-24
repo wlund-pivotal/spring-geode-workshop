@@ -1,29 +1,17 @@
-
-
-
-
 <h1 id="spring-boot-auto-configuration-for-apache-geode-pivotal-gemfire">Spring Boot Auto-configuration for Apache Geode &amp; Pivotal GemFire</h1>
-<p>John Blum
-:apache-geode-version: {apache-geode-doc-version}
-:apache-geode-docs: <a href="https://geode.apache.org/docs/guide/{apache-geode-version}">https://geode.apache.org/docs/guide/{apache-geode-version}</a>
-:toc: left
-:toclevels: 2
-:stylesdir: ../
-:highlightjsdir: ../js/highlight
-:docinfodir: guides</p>
-<p>This guide walks you through building a simple Customer Service, Spring Boot application using Apache Geode
+<p>This lab is a modified version of the guide provided by John Blum at <a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples">apache-geode-docs</a></p>
+<p>This lab walks you through building a simple Customer Service, Spring Boot application using Apache Geode
 to manage Customer interactions. You should already be familiar with Spring Boot and Apache Geode.</p>
 <p>By the end of this lesson, you should have a better understanding of what Spring Boot for Apache Geode’s (SBDG)
 <em>auto-configuration</em> support actually does.</p>
-<p>This guide compliments the <a href="../index.html#geode-auto-configuration-annotations">Auto-configuration vs. Annotation-based configuration</a>
+<p>This lab compliments the <a href="https://docs.spring.io/spring-boot-data-geode-build/1.1.x/reference/html5/configuration-annotations.html">Auto-configuration vs. Annotation-based configuration</a>
 chapter with concrete examples.</p>
-<p>Let’s begin.</p>
-<p>This guide builds on the <a href="https://www.youtube.com/watch?v=OvY5wzCtOV0"><em>Simplifying Apache Geode with Spring Data</em></a>
+<p>This lab builds on the <a href="https://www.youtube.com/watch?v=OvY5wzCtOV0"><em>Simplifying Apache Geode with Spring Data</em></a>
 presentation by John Blum during the 2017 SpringOne Platform conference. While this example as well as the example
 presented in the talk both use Spring Boot, only this example is using Spring Boot for Apache Geode (SBDG). This guide
 improves on the example from the presentation by using SBDG.</p>
 <p>link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html</a></p>
-<p>link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html/#geode-samples">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html\#geode-samples</a></p>
+<p>link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html/#geode-samples">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html/#geode-samples</a></p>
 <h2 id="application-domain-classes">Application Domain Classes</h2>
 <p>We will build the Spring Boot, Customer Service application from the ground up.</p>
 <h3 id="-customer-class"><code>Customer</code> class</h3>
@@ -57,7 +45,7 @@ class with <code>@Region</code>, which we will cover below.</p>
 <h3 id="-customerrepository-interface"><code>CustomerRepository</code> interface</h3>
 <p>Next, we create a <em>Data Access Object</em> (DAO) to persist <code>Customers</code> to Apache Geode. We create the DAO
 using Spring Data’s <em>Repository</em> abstraction:</p>
-<p><strong>CustomerRepository inteface.</strong></p>
+<p><strong>CustomerRepository interface.</strong></p>
 <pre><code><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">CustomerRepository</span> <span class="hljs-keyword"><span class="hljs-keyword">extends</span> <span class="hljs-type">CrudRepository</span></span>&lt;<span class="hljs-title">Customer</span>, <span class="hljs-title">Long</span>&gt; </span>{
 
     Customer findByNameLike(<span class="hljs-keyword">String</span> name);
@@ -153,7 +141,7 @@ create <code>Regions</code> which ultimately store the application’s data (sta
 structure, like <code>java.util.Map</code>, mapping a Key to a Value, or an Object. A <code>Region</code> is actually much more than a
 simple <code>Map</code> since it is distributed. However, since <code>Region</code> implements <code>java.util.Map</code>, it can be treated as such.</p>
 <p>A complete discussion of <code>Region</code> and it concepts are beyond the scope of this document. You may learn more
-by reading Apache Geode’s User Guide on {apache-geode-docs}/developing/region_options/chapter_overview.html[Regions].</p>
+by reading Apache Geode’s User Lab on {apache-geode-docs}/developing/region_options/chapter_overview.html[Regions].</p>
 <p>SBDG is opinionated and assumes most Apache Geode applications will be client applications in Apache Geode’s
 {apache-geode-docs}/topologies_and_comm/cs_configuration/chapter_overview.html[client/server topology].
 Therefore, SBDG auto-configures a <code>ClientCache</code> instance by default.</p>
@@ -658,4 +646,4 @@ public class CustomerServiceApplication {
 </code></pre><p>In addition to the <code>@ClientCacheApplication</code> annotation, you would need to annotate the <code>CustomerServiceApplication</code>
 class with SDG’s <code>@EnablePdx</code> annotation, which is responsible for configuring PDX serialization and registering
 SDG’s <code>MappingPdxSerializer</code>.</p>
-<p>link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html\#geode-samples">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html/#geode-samples</a></p>
+<p>link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html\#geode-samples">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html\#geode-samples</a></p>

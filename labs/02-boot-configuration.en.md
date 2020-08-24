@@ -1,26 +1,17 @@
 # Spring Boot Auto-configuration for Apache Geode & Pivotal GemFire
 
-John Blum
-:apache-geode-version: {apache-geode-doc-version}
-:apache-geode-docs: [https://geode.apache.org/docs/guide/{apache-geode-version}](https://geode.apache.org/docs/guide/{apache-geode-version})
-:toc: left
-:toclevels: 2
-:stylesdir: ../
-:highlightjsdir: ../js/highlight
-:docinfodir: guides
+This lab is a modified version of the guide provided by John Blum at [apache-geode-docs](https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples)
 
-This guide walks you through building a simple Customer Service, Spring Boot application using Apache Geode
+This lab walks you through building a simple Customer Service, Spring Boot application using Apache Geode
 to manage Customer interactions. You should already be familiar with Spring Boot and Apache Geode.
 
 By the end of this lesson, you should have a better understanding of what Spring Boot for Apache Geode’s (SBDG)
 *auto-configuration* support actually does.
 
-This guide compliments the [Auto-configuration vs. Annotation-based configuration](../index.html#geode-auto-configuration-annotations)
+This lab compliments the [Auto-configuration vs. Annotation-based configuration](https://docs.spring.io/spring-boot-data-geode-build/1.1.x/reference/html5/configuration-annotations.html)
 chapter with concrete examples.
 
-Let’s begin.
-
-This guide builds on the [*Simplifying Apache Geode with Spring Data*](https://www.youtube.com/watch?v=OvY5wzCtOV0)
+This lab builds on the [*Simplifying Apache Geode with Spring Data*](https://www.youtube.com/watch?v=OvY5wzCtOV0)
 presentation by John Blum during the 2017 SpringOne Platform conference. While this example as well as the example
 presented in the talk both use Spring Boot, only this example is using Spring Boot for Apache Geode (SBDG). This guide
 improves on the example from the presentation by using SBDG.
@@ -198,7 +189,7 @@ structure, like `java.util.Map`, mapping a Key to a Value, or an Object. A `Regi
 simple `Map` since it is distributed. However, since `Region` implements `java.util.Map`, it can be treated as such.
 
 A complete discussion of `Region` and it concepts are beyond the scope of this document. You may learn more
-by reading Apache Geode’s User Guide on {apache-geode-docs}/developing/region\_options/chapter\_overview.html\[Regions\].
+by reading Apache Geode’s User Lab on {apache-geode-docs}/developing/region\_options/chapter\_overview.html\[Regions\].
 
 SBDG is opinionated and assumes most Apache Geode applications will be client applications in Apache Geode’s
 {apache-geode-docs}/topologies\_and\_comm/cs\_configuration/chapter\_overview.html\[client/server topology\].

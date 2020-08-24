@@ -1,0 +1,15 @@
+<h2 id="environment-setup-has-to-be-rewritten-for-tanzu-gemfire-for-kubernetes-and-this-example">Environment Setup (Has to be rewritten for Tanzu Gemfire for Kubernetes and this example</h2>
+<h3 id="create-mysql-service-instance">Create Mysql Service Instance</h3>
+<p>Pizza store app will make service calls to this mysql instance</p>
+<pre><code><span class="hljs-string">cf </span><span class="hljs-built_in">create-service</span> p.<span class="hljs-string">mysql </span><span class="hljs-string">db-small </span><span class="hljs-string">workshop-db</span>
+</code></pre><h3 id="create-pcc-instance">Create PCC Instance</h3>
+<p>Services can be created through Apps Manager Marketplace or by executing cf cli commands</p>
+<h4 id="display-available-pcc-plans">Display available PCC plans</h4>
+<pre><code><span class="hljs-symbol">cf</span> <span class="hljs-keyword">marketplace </span>-s p-cloudcache
+</code></pre><h4 id="step-1-create-a-pcc-ondemand-service-in-your-org-space">Step 1: create a PCC OnDemand service in your org &amp; space</h4>
+<pre><code><span class="hljs-string">cf </span><span class="hljs-built_in">create-service</span> <span class="hljs-string">p-cloudcache </span><span class="hljs-string">dev-plan </span><span class="hljs-string">workshop-pcc</span>
+</code></pre><h4 id="step-2-create-service-key-for-retrieving-connection-information-for-gfsh-cli">Step 2: Create service key for retrieving connection information for GFSH cli</h4>
+<pre><code><span class="hljs-string">cf </span><span class="hljs-built_in">create-service-key</span> <span class="hljs-string">workshop-pcc </span><span class="hljs-string">devkey</span>
+</code></pre><h4 id="step-3-retrieve-url-for-pcc-cli-gfsh-and-corresponding-credentials">Step 3: Retrieve url for PCC cli (GFSH) and corresponding credentials</h4>
+<pre><code><span class="hljs-built_in">cf</span> service-<span class="hljs-built_in">key</span> workshop-pcc devkey
+</code></pre><h3 id="setup-pcc-cli-gfsh-">Setup PCC Cli (GFSH)</h3>

@@ -1,0 +1,92 @@
+Daniel profile	
+Daniel
+Active
+CTO
+10:20 pm in Tel Aviv, Israel
+Daniel profile
+Daniel
+Active
+Operator profile
+Hey Wayne,
+You've reached Strigo's urgent support chat.
+
+What seems to be the matter?
+Other
+11:41 am
+Operator profile
+This urgent support chat is reserved for urgent matters only.
+Do you have a critical issue?
+11:41 am
+Yes, I require immediate support
+11:42 am
+Operator profile
+Got it! One of our support representatives will be with you shortly.
+
+In the meantime, to help speed up the support process, would you mind telling us about the issue you are experiencing?
+11:42 am
+I have one week before I teach this workshop for S1P and I can't seem to figure out how to see the lab even though it shows in the class. How do I verify that the students have the lab?
+11:42 am
+It was my understanding that when they/we selected "My Lab" that.a lab tab would appear. I'm not seeing that.
+11:44 am
+Daniel profile
+Hi Wayne.
+What do you see when you move to the My Lab page?
+Also, can you please share the Strigo URL of a live event you're testing?
+Thank you
+11:55 am
+Ok.
+11:57 am
+I'm looking.
+11:57 am
+The My Lab just brings up the desktop env
+11:58 am
+https://app.strigo.io/event/wLny8xvagWXyHafzX
+11:58 am
+Daniel profile
+The My Lab page should show you the interface to the VM created for you based on the specifications provided for the equivalent resource in the Class template.
+So if you see the desktop env, this is what you should see.
+What did you expect to see? Or in other words, what do you mean by "lab"?
+12:00 pm
+I thought there would be another tab on top where they could select the lab and Charlie is also installing VSCode so I thought there would be a tab eventually for the VSCode application. How do we get the students to see the lab?
+12:01 pm
+When I say lab I mean the lab notes to execute the lab in the env.
+12:06 pm
+Daniel profile
+Ok, so guidance on the lab can be offered to the students in two ways:
+Just files on the VM itself.
+The Edit Interfaces capability, for the Resource row in the Class template back in the Admin console. You can add as many custom interfaces as you want, each will be displayed as its own tab in the My Lab page. These interfaces are all web-based, meaning they result in an iFrame in the My Lab page. So you can link to external resources such as web pages or hosted files that include the lab notes.
+You can also use the Edit Interfaces capability to link to a web app running on the VM itself.
+So if you have an IDE that can be exposed as a web interface, this could be a way to include an interface directly for the IDE.
+It's also worth mentioning that Strigo allows to write multi-step exercises for lab notes, but these are available only for our OD training environments for now, not for the live classroom. But they will soon be introduced there as well.
+12:11 pm
+so when I pasted lab notes into the labs what was that doing?
+12:14 pm
+I mean "Lab Exercises" in the class settup.
+12:15 pm
+Daniel profile
+That's the part I mentioned in the last paragraph, that is now available only for the OD training environments, and not for the live classroom.
+12:16 pm
+Got it. So my realistic choices are point at a url they can reach either on the vm or internet location or drop a lab exercise into the local environment.
+12:17 pm
+12:17 pm
+Our OD offering might not be open to your account, so it might be confusing.
+It's very similar to the live classroom, but meant for single student's self-learning.
+There, you get the My Lab interface to the VM, along with the lab instructions side-by-side.
+12:17 pm
+Daniel profile
+You are right about your options.
+I'm sorry for the inconvenience...
+I do hope you didn't invest too much time there, and that you will find the alternatives sufficient until we introduce the exercises to the live class.
+12:18 pm
+I attended the Spring on Kubernetes workshop about a month back and they used the top tabs on the My Lab for VSCode and the labs and it was very effective. Was that OD?
+12:19 pm
+It will be sufficient.
+12:19 pm
+Just curious how our Spring Team got those tabs to appear when they taught their workshop.
+12:19 pm
+I actually see the (On-demand only) on the Lab Exercises now :)
+12:20 pm
+1m ago. Not seen yet
+We run on Intercom
+
+Write a reply…
