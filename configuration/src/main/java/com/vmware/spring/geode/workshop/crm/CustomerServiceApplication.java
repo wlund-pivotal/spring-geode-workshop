@@ -15,6 +15,7 @@ list * Copyright 2020 the original author or authors.
  */
 package com.vmware.spring.geode.workshop.crm;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.springframework.boot.ApplicationRunner;
@@ -28,6 +29,9 @@ import org.springframework.geode.config.annotation.EnableClusterAware;
 import com.vmware.spring.geode.workshop.crm.model.Customer;
 import com.vmware.spring.geode.workshop.crm.repo.CustomerRepository;
 
+import io.codearte.jfairy.Fairy;
+import io.codearte.jfairy.producer.person.Person;
+
 /**
  * Spring Boot application implementing a Customer Service.
  *
@@ -39,9 +43,21 @@ import com.vmware.spring.geode.workshop.crm.repo.CustomerRepository;
  * @since 1.0.0
  */
 // tag::class[]
+/***/
 @SpringBootApplication
 @EnableClusterAware
 @EnableEntityDefinedRegions(basePackageClasses = Customer.class)
+
+/**
+ * 
+ * @author wlund
+ * Without AutoConfiguration
+@SpringBootApplication(exclude = ClientCacheAutoConfiguration.class)
+@EnableEntityDefinedRegions(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
+/**Disabling Spring Data Repositories Auto-configuration.**
+ @SpringBootApplication(exclude = RepositoriesAutoConfiguration.class)
+@EnableEntityDefinedRegions(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
+*/
 public class CustomerServiceApplication {
 
 	public static void main(String[] args) {
@@ -54,25 +70,34 @@ public class CustomerServiceApplication {
 
 	@Bean
 	ApplicationRunner runner(CustomerRepository customerRepository) {
+		
+		Fairy fairy = Fairy.create();
+
+		// Locating the max id to be enable incrementing of our ID. 
+		Long id = customerRepository.count();
+		
+		// Generate a random name from data generator
+		Person person = fairy.person();
 
 		return args -> {
 
-			assertThat(customerRepository.count()).isEqualTo(0);
+			assertThat(customerRepository.count()).isEqualTo(id);
 
-			Customer jonDoe = Customer.newCustomer(1L, "Jon Doe");
+			Customer jonDoe = Customer.newCustomer(id + 1L, person.fullName());
 
 			System.err.printf("Saving Customer [%s]%n", jonDoe);
 
 			jonDoe = customerRepository.save(jonDoe);
 
 			assertThat(jonDoe).isNotNull();
-			assertThat(jonDoe.getId()).isEqualTo(1L);
-			assertThat(jonDoe.getName()).isEqualTo("Jon Doe");
-			assertThat(customerRepository.count()).isEqualTo(1);
+			assertThat(jonDoe.getId()).isEqualTo(id + 1);
+			assertThat(jonDoe.getName()).isEqualTo(person.fullName());
+			assertThat(customerRepository.count()).isEqualTo(jonDoe.getId());
 
-			System.err.println("Querying for Customer [SELECT * FROM /Customers WHERE name LIKE '%Doe']");
+			String query = "Querying for Customer [SELECT * FROM /Customers WHERE name LIKE " + jonDoe.getName() + "]";
+			System.err.println(query);
 
-			Customer queriedJonDoe = customerRepository.findByNameLike("%Doe");
+			Customer queriedJonDoe = customerRepository.findByNameLike(person.fullName());
 
 			assertThat(queriedJonDoe).isEqualTo(jonDoe);
 

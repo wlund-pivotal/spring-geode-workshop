@@ -1,3 +1,18 @@
+From Me to Everyone: (2:07 PM)
+ https://app.strigo.io/event/Wa3KoDnWQ9cBqs3WP 
+From Charlie Black to Everyone: (2:07 PM)
+ 24th 03:30 pm URL https://app.strigo.io/event/Wa3KoDnWQ9cBqs3WP Access Token E29M 
+From Charlie Black to Everyone: (2:13 PM)
+ #!/usr/bin/env bash 
+From John Martin to Everyone: (2:24 PM)
+ I have to go soon…Wayne do you want me to go through the labs and get them to run on kind? And try it through vscode? 
+From Charlie Black to Everyone: (2:35 PM)
+ ubuntu@ip-172-31-27-38:~/spring-geode-workshop$ code configuration 
+From Charlie Black to Everyone: (2:42 PM)
+ kubectl -n CLUSTER-NAMESPACE exec -it NAME-locator-0 -- gfsh
+
+
+
 Daniel profile	
 Daniel
 Active

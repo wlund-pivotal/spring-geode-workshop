@@ -18,7 +18,7 @@ improves on the example from the presentation by using SBDG.
 
 link:https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html
 
-link:https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html/#geode-samples
+link:https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples
 
 ## Application Domain Classes
 
@@ -155,16 +155,16 @@ queries for "Jon Doe" using an OQL query with the predicate: `name LIKE '%Doe'`.
 
 ## Running the Example
 
-You can run the `CustomerServiceApplication` class from your IDE (e.g. IntelliJ IDEA) or from the command-line with
-the `gradlew` command.
+You can run the `CustomerServiceApplication` class from your IDE (e.g. Spring Tool Suite or IntelliJ IDEA) or from the command-line with
+the `mvn clean package` followed by the command.
 
 There is nothing special you must do to run the `CustomerServiceApplication` class from inside your IDE. Simply create
 a run profile configuration and run it.
 
-There is also nothing special about running the `CustomerServiceApplication` class from the command-line using `gradlew`.
-Simply execute it with `bootRun`:
+There is also nothing special about running the `CustomerServiceApplication` class from the command-line using `mvn`.
+Simply execute it with `spring-boot:bootRun`:
 
-`$ gradlew :spring-geode-samples-boot-configuration:bootRun`
+`$ mvn spring-boot:run
 
 If you wish to adjust the log levels for either Apache Geode or Spring Boot while running the example, then you can set
 the log level for the individual Loggers (i.e. `org.apache` or `org.springframework`)
@@ -189,10 +189,10 @@ structure, like `java.util.Map`, mapping a Key to a Value, or an Object. A `Regi
 simple `Map` since it is distributed. However, since `Region` implements `java.util.Map`, it can be treated as such.
 
 A complete discussion of `Region` and it concepts are beyond the scope of this document. You may learn more
-by reading Apache Geode’s User Lab on {apache-geode-docs}/developing/region\_options/chapter\_overview.html\[Regions\].
+by reading Apache Geode’s User guide on [*Developing with Apache Geode*](https://geode.apache.org/docs/guide/14/developing/book_intro.html)
 
 SBDG is opinionated and assumes most Apache Geode applications will be client applications in Apache Geode’s
-{apache-geode-docs}/topologies\_and\_comm/cs\_configuration/chapter\_overview.html\[client/server topology\].
+[*Topologies and Communication*](https://geode.apache.org/docs/guide/14/topologies_and_comm/book_intro.html)
 Therefore, SBDG auto-configures a `ClientCache` instance by default.
 
 The intrinsic `ClientCache` *auto-configuration* provided by SBDG can be made apparent by disabling it:
@@ -211,22 +211,21 @@ With the correct log level set, you will see an error message similar to:
 
 **Error resulting from no ClientCache instance.**
 
-    16:20:47.543 [main] DEBUG o.s.b.d.LoggingFailureAnalysisReporter - Application failed to start due to an exception
-    org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'example.app.crm.repo.CustomerRepository' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:1509) ~[spring-beans-5.0.13.RELEASE.jar:5.0.13.RELEASE]
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1104) ~[spring-beans-5.0.13.RELEASE.jar:5.0.13.RELEASE]
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1065) ~[spring-beans-5.0.13.RELEASE.jar:5.0.13.RELEASE]
-        at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:819) ~[spring-beans-5.0.13.RELEASE.jar:5.0.13.RELEASE]
-        ...
-    16:20:47.548 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
+2020-08-24 17:26:20,964 ERROR agnostics.LoggingFailureAnalysisReporter:  40 - 
 
-    ***************************
-    APPLICATION FAILED TO START
-    ***************************
+***************************
+APPLICATION FAILED TO START
+***************************
 
-    Description:
+Description:
 
-    Parameter 0 of method runner in example.app.crm.CustomerServiceApplication required a bean of type 'example.app.crm.repo.CustomerRepository' that could not be found.
+Parameter 0 of method runner in com.vmware.spring.geode.workshop.crm.CustomerServiceApplication required a bean of type 'com.vmware.spring.geode.workshop.crm.repo.CustomerRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.vmware.spring.geode.workshop.crm.repo.CustomerRepository' in your configuration.
+
 
 Essentially, the `CustomerRepository` could not be injected into our `CustomerServiceApplication` class,
 `ApplicationRunner` bean method because the `CustomerRepository`, which depends on the "Customers" Region,
@@ -234,18 +233,20 @@ could not be created. The `CustomerRepository` could not be created because the 
 could not be created. The "Customers" Region could not be created because there was no cache instance available
 (e.g. `ClientCache`) to create `Regions`, resulting in a trickling effect.
 
-The `ClientCache` *auto-configuration* is equivalent to the following:
+We are going to take advantage of an annotation that allows our developer environment to determine what environment
+we are running in and create a local (near) cache or a client server connection through auto configuration via the
+following:
 
 **Equivalent ClientCache configuration.**
 
     @SpringBootApplication
-    @ClientCacheApplication
-    @EnableEntityDefinedRegions(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
+    @EnableClusterAware
+    @EnableEntityDefinedRegions(basePackageClasses = Customer.class)
     public class CustomerServiceApplication {
       // ...
     }
 
-That is, you would need to explicitly declare the `@ClientCacheApplication` annotation if you were not using SBDG.
+Otherwise you would need to explicitly declare the `@ClientCacheApplication` annotation if you were not using SBDG.
 
 ### Repository instance
 
@@ -264,24 +265,27 @@ If we disable the Spring Data *Repository* *auto-configuration*:
 
 The application would throw a similar error on startup:
 
-**Error resulting from no proxied `CustomerRepository` instance.**
+2020-08-24 17:38:49,107  INFO xt.annotation.ConfigurationClassEnhancer: 323 - @Bean method PdxConfiguration.pdxDiskStoreAwareBeanFactoryPostProcessor is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+2020-08-24 17:38:49,112  INFO xt.annotation.ConfigurationClassEnhancer: 323 - @Bean method RegionTemplateAutoConfiguration.regionTemplateBeanFactoryPostProcessor is non-static and returns an object assignable to Spring's BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method's declaring @Configuration class. Add the 'static' modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
+2020-08-24 17:38:49,184  INFO trationDelegate$BeanPostProcessorChecker: 335 - Bean 'org.springframework.geode.boot.autoconfigure.DataImportExportAutoConfiguration' of type [org.springframework.geode.boot.autoconfigure.DataImportExportAutoConfiguration$$EnhancerBySpringCGLIB$$cb0836d1] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-24 17:38:49,229  WARN ation.AnnotationConfigApplicationContext: 559 - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'runner' defined in com.vmware.spring.geode.workshop.crm.CustomerServiceApplication: Unsatisfied dependency expressed through method 'runner' parameter 0; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.vmware.spring.geode.workshop.crm.repo.CustomerRepository' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2020-08-24 17:38:49,236  INFO ConditionEvaluationReportLoggingListener: 136 - 
 
-    17:31:21.231 [main] DEBUG o.s.b.d.LoggingFailureAnalysisReporter - Application failed to start due to an exception
-    org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'example.app.crm.repo.CustomerRepository' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:1509) ~[spring-beans-5.0.13.RELEASE.jar:5.0.13.RELEASE]
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1104) ~[spring-beans-5.0.13.RELEASE.jar:5.0.13.RELEASE]
-        at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1065) ~[spring-beans-5.0.13.RELEASE.jar:5.0.13.RELEASE]
-        at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:819) ~[spring-beans-5.0.13.RELEASE.jar:5.0.13.RELEASE]
-        ...
-    17:31:21.235 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter -
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2020-08-24 17:38:49,307 ERROR agnostics.LoggingFailureAnalysisReporter:  40 - 
 
-    ***************************
-    APPLICATION FAILED TO START
-    ***************************
+***************************
+APPLICATION FAILED TO START
+***************************
 
-    Description:
+Description:
 
-    Parameter 0 of method runner in example.app.crm.CustomerServiceApplication required a bean of type 'example.app.crm.repo.CustomerRepository' that could not be found.
+Parameter 0 of method runner in com.vmware.spring.geode.workshop.crm.CustomerServiceApplication required a bean of type 'com.vmware.spring.geode.workshop.crm.repo.CustomerRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.vmware.spring.geode.workshop.crm.repo.CustomerRepository' in your configuration.
 
 In this case, there was simply no proxy implementation for the `CustomerRepository` interface provided by the framework
 since the *auto-configuration* was disabled. The `ClientCache` and "Customers" `Region` do exist in this case, though.
@@ -312,38 +316,16 @@ the `@EnableEntityDefinedRegions` annotation.
 As was alluded to above, there was another reason we explicitly declared the `@Region` annotation
 on our `Customer` class.
 
-We could have defined the client `LOCAL` "Customers" Region using Spring JavaConfig, explicitly:
-
-**JavaConfig Bean Definition for the "Customers" Region.**
-
-    @Configuration
-    class ApplicationConfiguration {
-
-        @Bean("Customers")
-        public ClientRegionFactoryBean<Long, Customer> customersRegion(GemFireCache gemfireCache) {
-
-            ClientRegionFactoryBean<Long, Customer> customersRegion = new ClientRegionFactoryBean<>();
-
-            customersRegion.setCache(gemfireCache);
-            customersRegion.setShortcut(ClientRegionShortcut.LOCAL);
-
-            return customersRegion;
-        }
-    }
-
-Or, even define the "Customers" Region using Spring XML, explicitly:
-
-**XML Bean Definition for the "Customers" Region.**
-
-    <gfe:client-region id="Customers" shortcut="LOCAL"/>
-
-But, using SDG’s `@EnableEntityDefinedRegions` annotation is very convenient and can scan for the Regions
+Using SDG’s `@EnableEntityDefinedRegions` annotation is very convenient and can scan for the Regions
 (whether client or server (peer) Regions) required by your application based the entity classes themselves
-(e.g. `Customer`):
+(e.g. `Customer`). In addition, we are going to take advantage of a very useful annotation for allowing SBDG to
+automatically detect our topolocy (e.g. local/near cache or client server):
 
 **Annotation-based config for the "Customers" Region.**
 
-    @EnableEntityDefinedRegions(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
+    @SpringBootApplication
+    @EnableClusterAware
+    @EnableEntityDefinedRegions(basePackageClasses = Customer.class)
     class CustomerServiceApplication { }
 
 The `basePackageClasses` attribute is an alternative to `basePackages`, and a type-safe way to target the packages
@@ -353,14 +335,13 @@ to determine the package to begin the scan. 'basePackageClasses\` accepts an arr
 multiple independent top-level packages. The annotation also includes the ability to filter types.
 
 However, the `@EnableEntityDefinedRegions` annotation only works when the entity class (e.g. `Customer`) is explicitly
-annotated with the `@Region` annotation (e.g. `@Region("Customers")`), otherwise it ignores the class.
+annotated with the `@Region` annotation (e.g. `@Region("Customers")`), otherwise it ignores the class. You will find
+this annotation on Customer in the model package. 
 
-You will also notice that the data policy type (i.e. `clientRegionShort`, or simply `shortcut`) is set to `LOCAL`
-in our example. Why?
-
-Well, initially we just want to get up and running as quickly as possible, without a lot of ceremony and fuss. By using
-a client `LOCAL` Region to begin with, we are not required to start a cluster of servers for the client to be able to
-store data.
+Initially we just want to get up and running as quickly as possible, without a lot of ceremony and fuss. By not starting
+a locator/reegion and using @EnableClusterAware we allow SBDG to detect that we are using a client `LOCAL` Region and we
+are not required to start a cluster of servers for the client to be able to store data. This allows rapid development
+for developers. 
 
 While client `LOCAL` Regions can be useful for some purposes (e.g. local processing, querying and aggregating of data),
 it is more common for a client to persist data in a cluster of servers, and for that data to be shared by multiple
@@ -373,43 +354,26 @@ We continue with our example by switching from a local context to a client/serve
 If you are rapidly prototyping and developing your application and simply want to lift off the ground quickly, then it
 is useful to start locally and gradually migrate towards a client/server architecture.
 
-To switch to client/server, all you need to do is remove the `clientRegionShortcut` attribute configuration from the
+To switch to client/server, all you need to do is startup a gfsh locator(s) and server(s) and SBDG will automatically
+detect your topology. 
 `@EnableEntityDefinedRegions` annotation declaration:
 
 **Client/Server Topology Region Configuration.**
 
+    @SpringBootApplication
+    @EnableClusterAware
     @EnableEntityDefinedRegions(basePackageClasses = Customer.class)
+
     class CustomerServiceApplication { }
 
-The default value for the `clientRegionShortcut` attribute is `ClientRegionShortcut.PROXY`. This means no data is stored
-locally. All data is sent from the client to one or more servers in a cluster.
 
-However, if we try to run the application, it will fail:
-
-**NoAvailableServersException.**
-
-    Caused by: org.apache.geode.cache.client.NoAvailableServersException
-        at org.apache.geode.cache.client.internal.pooling.ConnectionManagerImpl.borrowConnection(ConnectionManagerImpl.java:234) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.client.internal.OpExecutorImpl.execute(OpExecutorImpl.java:136) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.client.internal.OpExecutorImpl.execute(OpExecutorImpl.java:115) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.client.internal.PoolImpl.execute(PoolImpl.java:763) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.client.internal.QueryOp.execute(QueryOp.java:58) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.client.internal.ServerProxy.query(ServerProxy.java:70) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.query.internal.DefaultQuery.executeOnServer(DefaultQuery.java:456) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.query.internal.DefaultQuery.execute(DefaultQuery.java:338) ~[geode-core-1.2.1.jar:?]
-        at org.springframework.data.gemfire.GemfireTemplate.find(GemfireTemplate.java:311) ~[spring-data-geode-2.0.14.RELEASE.jar:2.0.14.RELEASE]
-        at org.springframework.data.gemfire.repository.support.SimpleGemfireRepository.count(SimpleGemfireRepository.java:129) ~[spring-data-geode-2.0.14.RELEASE.jar:2.0.14.RELEASE]
-        ...
-        at example.app.crm.CustomerServiceApplication.lambda$runner$0(CustomerServiceApplication.java:59) ~[classes/:?]
-        at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:783) ~[spring-boot-2.0.9.RELEASE.jar:2.0.9.RELEASE]
-
-The client is expecting there to be a cluster of servers to communicate with and to store/access data from. Clearly,
-there are no servers or cluster running yet.
+The ClusterAware auto configuration determines the topology by determining whether there is a cluster of servers to
+communicate with and to store/access data from. Clearly,there are no servers or cluster running yet.
 
 There are several ways in which to start a cluster. For example, you may use Spring to configure and bootstrap
-the cluster, which has been demonstrated [here](../index.html#geode-cluster-configuration-bootstrapping).
+the cluster, which has been demonstrated [here](https://geode.apache.org/docs/guide/14/configuring/chapter_overview.html).
 
-Although, for this example, we are going to use the tools provided with Apache Geode, or Pivotal GemFire, i.e. *Gfsh*
+Although, for this example, we are going to use the tools provided with Apache Geode, or VMWare Tanzu  GemFire, i.e. *Gfsh*
 (GemFire/Geode Shell) for reasons that will become apparent later.
 
 You need to [download](https://geode.apache.org/releases/) and [install](https://geode.apache.org/docs/guide/18/prereq_and_install.html)
@@ -421,8 +385,6 @@ Once Apache Geode has been successfully installed, you can open a command prompt
 
 **Running Gfsh.**
 
-    $ echo $GEMFIRE
-    /Users/jblum/pivdev/apache-geode-1.2.1
 
 
     $ gfsh
@@ -437,58 +399,12 @@ Once Apache Geode has been successfully installed, you can open a command prompt
 
 You are set to go.
 
-For your convenience, a *Gfsh* shell script is provided to start a cluster:
-
-**Gfsh shell script.**
-
-    # Gfsh shell script to start a simple GemFire/Geode cluster
-
-    start locator --name=LocatorOne --log-level=config
-    configure pdx --read-serialized=true
-    start server --name=ServerOne --log-level=config
-
-Specifically, we are starting 1 Locator and 1 Server, all running with the default ports.
+The lab environment running on kubernetes was discussed in the lab setup.  Two locators and 2 servers have been started.
 
 Execute the *Gfsh* shell script using:
 
-**Run Gfsh shell script.**
 
-    gfsh>run --file=/path/to/spring-boot-data-geode/samples/boot/configuration/src/main/resources/geode/bin/start-simple-cluster.gfsh
-    1. Executing - start locator --name=LocatorOne --log-level=config
-
-    Starting a Geode Locator in /Users/jblum/pivdev/lab/LocatorOne...
-    ....
-    Locator in /Users/jblum/pivdev/lab/LocatorOne on 10.99.199.24[10334] as LocatorOne is currently online.
-    Process ID: 68425
-    Uptime: 2 seconds
-    Geode Version: 1.2.1
-    Java Version: 1.8.0_192
-    Log File: /Users/jblum/pivdev/lab/LocatorOne/LocatorOne.log
-    JVM Arguments: -Dgemfire.log-level=config -Dgemfire.enable-cluster-configuration=true -Dgemfire.load-cluster-configuration-from-dir=false -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
-    Class-Path: /Users/jblum/pivdev/apache-geode-1.2.1/lib/geode-core-1.2.1.jar:/Users/jblum/pivdev/apache-geode-1.2.1/lib/geode-dependencies.jar
-
-    Successfully connected to: JMX Manager [host=10.99.199.24, port=1099]
-
-    Cluster configuration service is up and running.
-
-    2. Executing - start server --name=ServerOne --log-level=config
-
-    Starting a Geode Server in /Users/jblum/pivdev/lab/ServerOne...
-    .....
-    Server in /Users/jblum/pivdev/lab/ServerOne on 10.99.199.24[40404] as ServerOne is currently online.
-    Process ID: 68434
-    Uptime: 2 seconds
-    Geode Version: 1.2.1
-    Java Version: 1.8.0_192
-    Log File: /Users/jblum/pivdev/lab/ServerOne/ServerOne.log
-    JVM Arguments: -Dgemfire.default.locators=10.99.199.24[10334] -Dgemfire.use-cluster-configuration=true -Dgemfire.start-dev-rest-api=false -Dgemfire.log-level=config -XX:OnOutOfMemoryError=kill -KILL %p -Dgemfire.launcher.registerSignalHandlers=true -Djava.awt.headless=true -Dsun.rmi.dgc.server.gcInterval=9223372036854775806
-    Class-Path: /Users/jblum/pivdev/apache-geode-1.2.1/lib/geode-core-1.2.1.jar:/Users/jblum/pivdev/apache-geode-1.2.1/lib/geode-dependencies.jar
-
-You will need to change the path to the `spring-boot-data-geode/samples/boot/configuration` directory in the
-`run --file=…​` *Gfsh* command above based on where you git cloned the `spring-boot-data-geode` project
-to your computer.
-
-Now, our simple cluster with an Apache Geode Locator and (Cache) Server is running. We can verify by listing
+With our gemfire-cluster create with an two Apache Geode Locators and (Cache) Servers running we can verify by listing
 and describing the members:
 
 **List and Describe Members.**
@@ -595,32 +511,24 @@ our rescue. We simply only need to enable cluster configuration from the client:
 **Enable Cluster Configuration.**
 
     @SpringBootApplication
-    @EnableEntityDefinedRegions(basePackageClasses = Customer.class)
-    @EnableClusterConfiguration(useHttp = true)
+    @EnableClusterAware
+    @EnableEntityDefinedRegions(basePackageClasses = Customer.class)    @SpringBootApplication
     public class CustomerServiceApplication {
       // ...
     }
 
-That is, we additionally annotate our Customer Service application class with SDG’s `@EnableClusterConfiguration`
-annotation. We have also set the `useHttp` attribute to `true`. This sends the configuration metadata from the client
-to the cluster via GemFire/Geode’s Management REST API.
-
-This is useful when your GemFire/Geode cluster may be running behind a firewall, such as on public cloud infrastructure.
-However, there are other benefits to using HTTP as well. As stated, the client sends configuration metadata to
-GemFire/Geode’s Management REST interface, which is a facade for the server-side Cluster Configuration Service. If
-another peer (e.g. server) is added to the cluster as a member, then this member will get the same configuration. If
-the entire cluster goes down, it will have the same configuration when it is restarted.
 
 SDG is careful not to stomp on existing Regions since those Regions may have data already. Declaring the
-`@EnableClusterConfiguration` annotation is a useful development-time feature, but it is recommended that you
+@EnableClusterConfiguration` annotation is a useful development-time feature, but it is recommended that you
 explicitly define and declare your Regions in production environments, either using *Gfsh* or Spring confg.
 
 It is now possible to replace the SDG `@EnableClusterConfiguration` annotation with SBDG’s `@EnableClusterAware`
-annotation, which has the same effect of pushing configuration metadata from the client to the server (or cluster).
-Additionally, SBDG’s `@EnableClusterAware` annotation makes it unnecessary to explicitly have to configure the
-`clientRegionShortcut` on the SDG `@EnableEntityDefinedRegions` annotation (or similar annotation, e.g. SDG’s
-`@EnableCachingDefinedRegions`). Finally, because the SBDG `@EnableClusterAware` annotation is meta-annotated with
-SDG’s `@EnableClusterConfiguration annotation` is automatically configures the `useHttp` attribute to `true`.
+annotation as you see above in the src code, which has the same effect of pushing configuration metadata from the
+client to the server (or cluster). Additionally, SBDG’s `@EnableClusterAware` annotation makes it unnecessary to
+explicitly have to configure parameters like `clientRegionShortcut` on the SDG `@EnableEntityDefinedRegions`
+annotation (or similar annotation, e.g. SDG’s `@EnableCachingDefinedRegions`). Finally, because the SBDG's`
+@EnableClusterAware` annotation is meta-annotated with SDG’s `@EnableClusterConfiguration annotation` is automatically
+configured with the `useHttp` attribute to `true`.
 
 Now, we can run our application again, and this time, it works!
 
@@ -726,96 +634,19 @@ application domain model types to make them `Serializable`, such as when using a
 So, SBDG auto-configures PDX and uses Spring Data Geode’s `MappingPdxSerializer` as the `PdxSerializer` to de/serialize
 all application domain model types.
 
-If we disable PDX *auto-configuration*, we will see the effects of trying to serialize a non-serializable type,
-`Customer`.
-
-First, let’s back up a few steps and destroy the server-side "Customers" Region:
-
-**Destroy "Customers" Region.**
-
-    gfsh>destroy region --name=/Customers
-    "/Customers"  destroyed successfully.
+If we were to disable PDX *auto-configuration*, you would see the effects of trying to serialize a non-serializable type,
+`Customer`.  This would be apparent when you tried to query /Customers. We will leave this as an exercise for the student. 
 
 
-    gfsh>list regions
-    No Regions Found
-
-Then, we disable PDX *auto-configuration*:
-
-**Disable PDX Auto-configuration.**
-
-    @SpringBootApplication(exclude = PdxSerializationAutoConfiguration.class)
-    @EnableEntityDefinedRegions(basePackageClasses = Customer.class)
-    @EnableClusterConfiguration(useHttp = true)
-    public class CustomerServiceApplication {
-      // ...
-    }
-
-When we re-run the application, we get the error we would expect:
-
-**NotSerializableException.**
-
-    Caused by: java.io.NotSerializableException: example.app.crm.model.Customer
-        at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:1184) ~[?:1.8.0_192]
-        at java.io.ObjectOutputStream.writeObject(ObjectOutputStream.java:348) ~[?:1.8.0_192]
-        at org.apache.geode.internal.InternalDataSerializer.writeSerializableObject(InternalDataSerializer.java:2248) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.InternalDataSerializer.basicWriteObject(InternalDataSerializer.java:2123) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.DataSerializer.writeObject(DataSerializer.java:2936) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.util.BlobHelper.serializeTo(BlobHelper.java:66) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.tier.sockets.Message.serializeAndAddPart(Message.java:396) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.tier.sockets.Message.addObjPart(Message.java:340) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.tier.sockets.Message.addObjPart(Message.java:319) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.client.internal.PutOp$PutOpImpl.<init>(PutOp.java:281) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.client.internal.PutOp.execute(PutOp.java:66) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.cache.client.internal.ServerRegionProxy.put(ServerRegionProxy.java:162) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.LocalRegion.serverPut(LocalRegion.java:3006) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.LocalRegion.cacheWriteBeforePut(LocalRegion.java:3115) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.ProxyRegionMap.basicPut(ProxyRegionMap.java:222) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.LocalRegion.virtualPut(LocalRegion.java:5628) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.LocalRegionDataView.putEntry(LocalRegionDataView.java:151) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.LocalRegion.basicPut(LocalRegion.java:5057) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.LocalRegion.validatedPut(LocalRegion.java:1595) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.LocalRegion.put(LocalRegion.java:1582) ~[geode-core-1.2.1.jar:?]
-        at org.apache.geode.internal.cache.AbstractRegion.put(AbstractRegion.java:325) ~[geode-core-1.2.1.jar:?]
-        at org.springframework.data.gemfire.GemfireTemplate.put(GemfireTemplate.java:193) ~[spring-data-geode-2.0.14.RELEASE.jar:2.0.14.RELEASE]
-        at org.springframework.data.gemfire.repository.support.SimpleGemfireRepository.save(SimpleGemfireRepository.java:86) ~[spring-data-geode-2.0.14.RELEASE.jar:2.0.14.RELEASE]
-        ...
-        at example.app.crm.CustomerServiceApplication.lambda$runner$0(CustomerServiceApplication.java:70) ~[spring-samples-boot-configuration-1.0.0.RELEASE.jar]
-        at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:783) ~[spring-boot-2.0.9.RELEASE.jar:2.0.9.RELEASE]
-        ...
-
-Our "Customers" Region is recreated, but is empty:
-
-**Empty "Customers" Region.**
-
-    gfsh>list regions
-    List of regions
-    ---------------
-    Customers
-
-
-    gfsh>describe region --name=/Customers
-    ..........................................................
-    Name            : Customers
-    Data Policy     : partition
-    Hosting Members : ServerOne
-
-    Non-Default Attributes Shared By Hosting Members
-
-     Type  |    Name     | Value
-    ------ | ----------- | ---------
-    Region | size        | 0
-           | data-policy | PARTITION
-
-So, SBDG takes care of all your serialization needs without you having to configure serialization or implement
+SBDG takes care of all your serialization needs without you having to configure serialization or implement
 `java.io.Serializable` in all your application domain model types, including types your application domain model types
 might refer to, which may not be possible.
 
 If you were not using SBDG, then you would need to enable PDX serialization explicitly.
 
-The PDX *auto-configuration* provided by SBDG is equivalent to:
+The Spring Boot Data Geode/Gemfire PDX *auto-configuration* provided by SBDG is equivalent to:
 
-**Equivalent PDX Configuration.**
+**Equivalent PDX Configuration with Spring Data Gemfire.**
 
     @SpringBootApplication
     @ClientCacheApplication
@@ -830,4 +661,4 @@ In addition to the `@ClientCacheApplication` annotation, you would need to annot
 class with SDG’s `@EnablePdx` annotation, which is responsible for configuring PDX serialization and registering
 SDG’s `MappingPdxSerializer`.
 
-link:https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html\#geode-samples
+[*Sample Applications*](https://docs.spring.io/spring-gemfire/docs/current/reference/html/#samples).

@@ -1,12 +1,34 @@
 ## Environment Setup (Has to be rewritten for Tanzu Gemfire for Kubernetes and this example
 
-### Create Mysql Service Instance
+You need to [download](https://geode.apache.org/releases/) and [install](https://geode.apache.org/docs/guide/18/prereq_and_install.html)
+a full distribution of Apache Geode to make use of the provided tools. After installation, you will need to set
+the `GEODE` (or `GEMFIRE`) environment variable to the location of your installation. Additionally, add `$GEODE/bin`
+to your system `$PATH`.
 
-Pizza store app will make service calls to this mysql instance
+Once Apache Geode has been successfully installed, you can open a command prompt (terminal) and do:
 
-```
-cf create-service p.mysql db-small workshop-db
-```
+**Running Gfsh.**
+
+    $ echo $GEMFIRE
+    /Users/jblum/pivdev/apache-geode-1.2.1
+
+**Running Gfsh.**
+
+
+
+    $ gfsh
+        _________________________     __
+       / _____/ ______/ ______/ /____/ /
+      / /  __/ /___  /_____  / _____  /
+     / /__/ / ____/  _____/ / /    / /
+    /______/_/      /______/_/    /_/    1.2.1
+
+    Monitor and Manage Apache Geode
+    gfsh>
+
+You are set to go.
+
+For your convenience, a *Gfsh* shell script is provided to start a cluster:
 
 ### Create PCC Instance
 Services can be created through Apps Manager Marketplace or by executing cf cli commands
