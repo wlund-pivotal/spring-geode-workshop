@@ -60,7 +60,6 @@ gemfire1   2/2        1/2
 ```bash
 kubectl  exec -it gemfire-locator-0 -- gfsh
 ```
-
 ## Verify Gemfire is working
 
 Since the cluster is deployed for us we need only connect. Do the following:
@@ -69,4 +68,9 @@ Since the cluster is deployed for us we need only connect. Do the following:
 gfsh>connect
 ```
 
+and to see the topology and configuraton of your clustter you can do the following:
+
+```bash
+gfsh>list members
+```
 
