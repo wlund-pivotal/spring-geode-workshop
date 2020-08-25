@@ -1,85 +1,47 @@
-## Environment Setup (Has to be rewritten for Tanzu Gemfire for Kubernetes and this example
+# Environment Setup for Gemfire Cluster on Kubernetes
 
-You need to [download](https://geode.apache.org/releases/) and [install](https://geode.apache.org/docs/guide/18/prereq_and_install.html)
-a full distribution of Apache Geode to make use of the provided tools. After installation, you will need to set
-the `GEODE` (or `GEMFIRE`) environment variable to the location of your installation. Additionally, add `$GEODE/bin`
-to your system `$PATH`.
+## Create Gemfire Cluster
+We are going to take a very simple approach to creating our gemfire cluster by entering the following:
 
-Once Apache Geode has been successfully installed, you can open a command prompt (terminal) and do:
-
-**Running Gfsh.**
-
-    $ echo $GEMFIRE
-    /Users/jblum/pivdev/apache-geode-1.2.1
-
-**Running Gfsh.**
-
-
-
-    $ gfsh
-        _________________________     __
-       / _____/ ______/ ______/ /____/ /
-      / /  __/ /___  /_____  / _____  /
-     / /__/ / ____/  _____/ / /    / /
-    /______/_/      /______/_/    /_/    1.2.1
-
-    Monitor and Manage Apache Geode
-    gfsh>
-
-You are set to go.
-
-For your convenience, a *Gfsh* shell script is provided to start a cluster:
-
-### Create PCC Instance
-Services can be created through Apps Manager Marketplace or by executing cf cli commands
-
-#### Display available PCC plans
-
+```bash
+$ kubectl create gemfire-cluster
 ```
-cf marketplace -s p-cloudcache
+This creates a gemfire cluster in the default namespace. There is a more complete example tha can be found with the docs at
+[VMware Tanzu Gemfire](https://tgf.docs.pivotal.io/tgf/beta/create-and-delete.html).  In our simplified approach we will not use security.
+
+
+## Apply the CRD for your Tanzu GemFire cluster, as in this development environment example:
+
+```bash
+$ cat << EOF | kubectl -n gemfire-cluster apply -f -
+apiVersion: core.geode.apache.org/v1alpha1
+kind: GeodeCluster
+metadata:
+  name: gemfire1
+spec:
+  locators:
+    replicas: 2
+  servers:
+    replicas: 2
+EOF
 ```
 
-#### Step 1: create a PCC OnDemand service in your org & space
+## check the creation status of the Tanzu GemFire cluster:
 
-```
-cf create-service p-cloudcache dev-plan workshop-pcc
+```bash
 
-```
+## Connect to the Tanzu GemFire Cluster
 
-#### Step 2: Create service key for retrieving connection information for GFSH cli
-
-```
-cf create-service-key workshop-pcc devkey
+```bash
+kubectl  exec -it gemfire-locator-0 -- gfsh
 ```
 
-#### Step 3: Retrieve url for PCC cli (GFSH) and corresponding credentials
+## Verify Gemfire is working
 
-```
-cf service-key workshop-pcc devkey
-```
+Since the cluster is deployed for us we need only connect. Do he following:
 
-### Setup PCC Cli (GFSH)
-
-Download the Cli from PivNet - https://network.pivotal.io. Version of software Pivotal GemFire 9.6.0
-
-
-Note: Version of PCC Cli needs to match that of PCC Cluster.
-
-#### Step 1: Login into to PCC cli (GFSH) using connection information from service key
-
-```
-connect --use-http=true --url=<gfsh-url> --user=cluster_operator --password=*******
+```bash
+gfsh>connect
 ```
 
-Note: If `go-router` is configured only to use https connection. PCC Cli will ask for SSL/TLS information. If using Public certs, we can skip providing keystore and truststore information.
 
-#### Step 2: create PCC regions on cluster
-
-Note: Region name created on PCC server and client should match
-
-```
-create region --name=customer --type=PARTITION_REDUNDANT
-create region --name=pizza_orders --type=PARTITION_REDUNDANT
-```
-
-#### Step 3: Access pulse using connection information from service key 
