@@ -1,15 +1,31 @@
-<h2 id="environment-setup-has-to-be-rewritten-for-tanzu-gemfire-for-kubernetes-and-this-example">Environment Setup (Has to be rewritten for Tanzu Gemfire for Kubernetes and this example</h2>
-<h3 id="create-mysql-service-instance">Create Mysql Service Instance</h3>
-<p>Pizza store app will make service calls to this mysql instance</p>
-<pre><code><span class="hljs-string">cf </span><span class="hljs-built_in">create-service</span> p.<span class="hljs-string">mysql </span><span class="hljs-string">db-small </span><span class="hljs-string">workshop-db</span>
-</code></pre><h3 id="create-pcc-instance">Create PCC Instance</h3>
-<p>Services can be created through Apps Manager Marketplace or by executing cf cli commands</p>
-<h4 id="display-available-pcc-plans">Display available PCC plans</h4>
-<pre><code><span class="hljs-symbol">cf</span> <span class="hljs-keyword">marketplace </span>-s p-cloudcache
-</code></pre><h4 id="step-1-create-a-pcc-ondemand-service-in-your-org-space">Step 1: create a PCC OnDemand service in your org &amp; space</h4>
-<pre><code><span class="hljs-string">cf </span><span class="hljs-built_in">create-service</span> <span class="hljs-string">p-cloudcache </span><span class="hljs-string">dev-plan </span><span class="hljs-string">workshop-pcc</span>
-</code></pre><h4 id="step-2-create-service-key-for-retrieving-connection-information-for-gfsh-cli">Step 2: Create service key for retrieving connection information for GFSH cli</h4>
-<pre><code><span class="hljs-string">cf </span><span class="hljs-built_in">create-service-key</span> <span class="hljs-string">workshop-pcc </span><span class="hljs-string">devkey</span>
-</code></pre><h4 id="step-3-retrieve-url-for-pcc-cli-gfsh-and-corresponding-credentials">Step 3: Retrieve url for PCC cli (GFSH) and corresponding credentials</h4>
-<pre><code><span class="hljs-built_in">cf</span> service-<span class="hljs-built_in">key</span> workshop-pcc devkey
-</code></pre><h3 id="setup-pcc-cli-gfsh-">Setup PCC Cli (GFSH)</h3>
+<h1 id="environment-setup-for-gemfire-cluster-on-kubernetes">Environment Setup for Gemfire Cluster on Kubernetes</h1>
+<h2 id="create-gemfire-cluster">Create Gemfire Cluster</h2>
+<p>We are going to take a very simple approach to creating our gemfire cluster by entering the following:</p>
+<pre><code class="lang-bash"><span class="hljs-variable">$ </span>kubectl create gemfire-cluster
+</code></pre>
+<p>This creates a gemfire cluster in the default namespace. There is a more complete example tha can be found with the docs at
+<a href="https://tgf.docs.pivotal.io/tgf/beta/create-and-delete.html">VMware Tanzu Gemfire</a>.  In our simplified approach we will not use security.</p>
+<h2 id="apply-the-crd-for-your-tanzu-gemfire-cluster-as-in-this-development-environment-example-">Apply the CRD for your Tanzu GemFire cluster, as in this development environment example:</h2>
+<pre><code class="lang-bash">$ cat &lt;&lt; EOF | kubectl -n gemfire-cluster apply -f -
+<span class="hljs-attr">apiVersion:</span> core.geode.apache.org/v1alpha1
+<span class="hljs-attr">kind:</span> GeodeCluster
+<span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> gemfire1
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  locators:</span>
+<span class="hljs-attr">    replicas:</span> <span class="hljs-number">2</span>
+<span class="hljs-attr">  servers:</span>
+<span class="hljs-attr">    replicas:</span> <span class="hljs-number">2</span>
+EOF
+</code></pre>
+<h2 id="check-the-creation-status-of-the-tanzu-gemfire-cluster-">check the creation status of the Tanzu GemFire cluster:</h2>
+<pre><code class="lang-bash">
+## Connect to the Tanzu GemFire Cluster
+
+```bash
+kubectl  exec -it gemfire-locator<span class="hljs-number">-0</span> -- gfsh
+</code></pre>
+<h2 id="verify-gemfire-is-working">Verify Gemfire is working</h2>
+<p>Since the cluster is deployed for us we need only connect. Do he following:</p>
+<pre><code class="lang-bash">gfsh&gt;<span class="hljs-built_in">connect</span>
+</code></pre>
