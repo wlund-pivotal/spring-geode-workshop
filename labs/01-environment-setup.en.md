@@ -36,7 +36,6 @@ spec:
   servers:
     replicas: 2
 ```
-
 and create the gemfire-cluster with the following command:
 
 ```bash
@@ -46,6 +45,15 @@ kubectl apply -f gemfire-cluster.yaml
 ## check the creation status of the Tanzu GemFire cluster:
 
 ```bash
+ kubectl  get GeodeClusters
+```
+
+and you should see an output that looks similar to this:
+
+```bash
+NAME       LOCATORS   SERVERS
+gemfire1   2/2        1/2
+```
 
 ## Connect to the Tanzu GemFire Cluster
 
@@ -55,7 +63,7 @@ kubectl  exec -it gemfire-locator-0 -- gfsh
 
 ## Verify Gemfire is working
 
-Since the cluster is deployed for us we need only connect. Do he following:
+Since the cluster is deployed for us we need only connect. Do the following:
 
 ```bash
 gfsh>connect

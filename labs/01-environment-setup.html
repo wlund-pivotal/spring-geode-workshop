@@ -31,13 +31,16 @@ EOF
 <pre><code class="lang-bash">kubectl apply <span class="hljs-_">-f</span> gemfire-cluster.yaml
 </code></pre>
 <h2 id="check-the-creation-status-of-the-tanzu-gemfire-cluster-">check the creation status of the Tanzu GemFire cluster:</h2>
-<pre><code class="lang-bash">
-## Connect to the Tanzu GemFire Cluster
-
-```bash
-kubectl  exec -it gemfire-locator<span class="hljs-number">-0</span> -- gfsh
+<pre><code class="lang-bash"> kubectl  <span class="hljs-keyword">get</span> GeodeClusters
+</code></pre>
+<p>and you should see an output that looks similar to this:</p>
+<pre><code class="lang-bash">NAME       LOCATORS   SERVERS
+gemfire1   <span class="hljs-number">2</span>/<span class="hljs-number">2</span>        <span class="hljs-number">1</span>/<span class="hljs-number">2</span>
+</code></pre>
+<h2 id="connect-to-the-tanzu-gemfire-cluster">Connect to the Tanzu GemFire Cluster</h2>
+<pre><code class="lang-bash">kubectl  exec -<span class="hljs-keyword">it</span> gemfire-locator<span class="hljs-number">-0</span> <span class="hljs-comment">-- gfsh</span>
 </code></pre>
 <h2 id="verify-gemfire-is-working">Verify Gemfire is working</h2>
-<p>Since the cluster is deployed for us we need only connect. Do he following:</p>
+<p>Since the cluster is deployed for us we need only connect. Do the following:</p>
 <pre><code class="lang-bash">gfsh&gt;<span class="hljs-built_in">connect</span>
 </code></pre>
