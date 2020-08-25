@@ -4,6 +4,7 @@ out/
 target/
 bin/
 
+*.~
 .gradle
 .springBeans
 *.iml
