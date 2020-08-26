@@ -4,7 +4,7 @@
 
 We are going to work in the default namespace. There is a more complete example that can be found with the docs at
 [VMware Tanzu Gemfire](https://tgf.docs.pivotal.io/tgf/beta/create-and-delete.html) where the first step is
-to create a gemfire-cluster namespace.  Alsom In our simplified approach we will not use security.
+to create a gemfire-cluster namespace.  
 
 
 ## Apply the CRD for your Tanzu GemFire cluster, as in this development environment example:
@@ -16,7 +16,7 @@ kind: GeodeCluster
 metadata:
   name: gemfire1
 spec:
-  locators:
+  exposeExternalManagement: true
     replicas: 2
   servers:
     replicas: 2
@@ -31,6 +31,7 @@ kind: GeodeCluster
 metadata:
   name: gemfire1
 spec:
+  exposeExternalManagement: true
   locators:
     replicas: 2
   servers:
@@ -42,7 +43,7 @@ and create the gemfire-cluster with the following command:
 kubectl apply -f gemfire-cluster.yaml
 ```
 
-## check the creation status of the Tanzu GemFire cluster:
+## Check the creation status of the Tanzu GemFire cluster:
 
 ```bash
  kubectl  get GeodeClusters
@@ -55,14 +56,14 @@ NAME       LOCATORS   SERVERS
 gemfire1   2/2        1/2
 ```
 
-## Connect to the Tanzu GemFire Cluster
+##  Start the Tanzu GemFire Shell (GFSH)
 
 ```bash
 kubectl  exec -it gemfire-locator-0 -- gfsh
 ```
-## Verify Gemfire is working
+## Connect to the Tanzu GemFire cluster
 
-Since the cluster is deployed for us we need only connect. Do the following:
+Once GFSH is running, we need to connect to the GemFire cluster through the following command:
 
 ```bash
 gfsh>connect
