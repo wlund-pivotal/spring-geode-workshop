@@ -1,6 +1,6 @@
-# Spring Boot Auto-configuration for Apache Geode & Pivotal GemFire
+# Spring Boot Auto-configuration for Tanzu GemFire
 
-This lab is a modified version of the guide provided by John Blum at [apache-geode-docs](https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples)
+This lab is a modified version of the guide provided by John Blum at [apache-geode-docs](https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html)
 
 This lab walks you through building a simple Customer Service, Spring Boot application using Apache Geode
 to manage Customer interactions. You should already be familiar with Spring Boot and Apache Geode.
@@ -8,26 +8,14 @@ to manage Customer interactions. You should already be familiar with Spring Boot
 By the end of this lesson, you should have a better understanding of what Spring Boot for Apache Geode’s (SBDG)
 *auto-configuration* support actually does.
 
-This lab compliments the [Auto-configuration vs. Annotation-based configuration](https://docs.spring.io/spring-boot-data-geode-build/1.1.x/reference/html5/configuration-annotations.html)
-chapter with concrete examples.
-
-This lab builds on the [*Simplifying Apache Geode with Spring Data*](https://www.youtube.com/watch?v=OvY5wzCtOV0)
-presentation by John Blum during the 2017 SpringOne Platform conference. While this example as well as the example
-presented in the talk both use Spring Boot, only this example is using Spring Boot for Apache Geode (SBDG). This guide
-improves on the example from the presentation by using SBDG.
-
-link:https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html
-
-link:https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples
-
 ## Application Domain Classes
 
 We will build the Spring Boot, Customer Service application from the ground up.
 
 ### `Customer` class
 
-Like any sensible application development project, we begin by modeling the data our application needs to manage,
-namely a `Customer`. For this example, the `Customer` class is implemented as follows:
+We begin by modeling the data our application needs to manage, namely a `Customer`. 
+For this example, the `Customer` class is implemented as follows:
 
 **Customer class.**
 
@@ -47,18 +35,13 @@ namely a `Customer`. For this example, the `Customer` class is implemented as fo
 
 The `Customer` class uses [Project Lombok](https://projectlombok.org/) to simplify the implementation so we can focus on
 the details we care about. Lombok is useful for testing or prototyping purposes. However, using Project Lombok is
-optional and in most production applications, and I would not recommend it.
+optional and in most production applications, and not recommended it.
 
-Additionally, the `Customer` class is annotated with Spring Data Geode’s (SDG) `@Region` annotation. `@Region`
-is a mapping annotation declaring the Apache Geode cache `Region` in which `Customer` data will be persisted.
+The `Customer` class is annotated with Spring Data Geode’s (SDG) `@Region` annotation. `@Region`
+is a mapping annotation declaring the Apache Geode cache `Region` in which `Customer` data will be persisted.  A `Region` is a distributed version of `java.util.Map`.
 
-Finally, the `org.springframework.data.annotation.Id` annotation was used to designate the `Customer.id` field as
+Tthe `@Id` annotation is used to designate the `Customer.id` field as
 the identifier for `Customer` objects. The identifier is the Key used in the Entry stored in the "Customers"\`Region\`.
-A `Region` is a distributed version of `java.util.Map`.
-
-If the `@Region` annotation is not explicitly declared, then SDG uses the simple name of the class, which in this
-case is "Customer", to identify the `Region`. However, there is another reason we explicitly annotated the `Customer`
-class with `@Region`, which we will cover below.
 
 ### `CustomerRepository` interface
 
@@ -81,13 +64,7 @@ any query methods you may have explicitly defined on the interface in addition t
 the `CrudRepository` interface extension.
 
 In addition to the base `CrudRepository` operations, `CustomerRepository` has additionally defined a
-`findByNameLike(:String):Customer` query method. The Apache Geode OQL query is derived from the method declaration.
-
-Though it is beyond the scope of this document, Spring Data’s *Repository* infrastructure is capable of generating
-data store specific queries (e.g. Apache Geode OQL) for *Repository* interface query method declarations just by
-introspecting the method signature. The query methods must conform to specific conventions. Alternatively, users
-may use `@Query` to annotate query methods to specify the raw query instead (i.e. OQL for Apache Geode, SQL for JDBC,
-possibly HQL for JPA, and so on).
+`findByNameLike(:String):Customer` query method. 
 
 ### `CustomerServiceApplication` (Spring Boot main class)
 
@@ -141,7 +118,7 @@ to drive the interactions with Customers:
 The `CustomerServiceApplication` class is annotated with `@SpringBootApplication`. Therefore, the main class is
 a proper Spring Boot application equipped with all the features of Spring Boot (e.g. *auto-configuration*).
 
-Additionally, we use Spring Boot’s `SpringApplicationBuilder` in the `main` method to configure and bootstrap
+We use Spring Boot’s `SpringApplicationBuilder` in the `main` method to configure and bootstrap
 the Customer Service application.
 
 Then, we declare a Spring Boot `ApplicationRunner` bean, which is invoked by Spring Boot after the Spring container
@@ -155,41 +132,23 @@ queries for "Jon Doe" using an OQL query with the predicate: `name LIKE '%Doe'`.
 
 ## Running the Example
 
-You can run the `CustomerServiceApplication` class from your IDE (e.g. Spring Tool Suite or IntelliJ IDEA) or from the command-line with
-the `mvn clean package` followed by the command.
+You can build the `CustomerServiceApplication` class from your IDE (e.g. IntelliJ IDEA, Spring Tool Suite, VScode ) or from the command-line with
+the `mvn clean package`.
 
-There is nothing special you must do to run the `CustomerServiceApplication` class from inside your IDE. Simply create
-a run profile configuration and run it.
+Then run the `CustomerServiceApplication` class from the command-line using the command 
 
-There is also nothing special about running the `CustomerServiceApplication` class from the command-line using `mvn`.
-Simply execute it with `spring-boot:bootRun`:
-
-`$ mvn spring-boot:run
-
-If you wish to adjust the log levels for either Apache Geode or Spring Boot while running the example, then you can set
-the log level for the individual Loggers (i.e. `org.apache` or `org.springframework`)
-in `src/main/resources/logback.xml`:
-
-**spring-geode-samples/boot/configuration/src/main/resources/logback.xml.**
-
-    include::/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/configuration/src/main/resources/logback.xml
+`$ mvn spring-boot:run`
 
 ## Auto-configuration for Apache Geode, Take One
 
-"*With great power comes great responsibility.*" - Uncle Ben
-
-While it is not apparent (yet), there is a lot of hidden, intrinsic power provided by Spring Boot Data Geode (SBDG)
+While it is not apparent, there is a lot of hidden, intrinsic power provided by Spring Boot Data Geode (SBDG)
 in this example.
 
 ### Cache instance
 
 First, in order to put anything into Apache Geode you need a cache instance. A cache instance is also required to
-create `Regions` which ultimately store the application’s data (state). Again, a `Region` is just a Key/Value data
-structure, like `java.util.Map`, mapping a Key to a Value, or an Object. A `Region` is actually much more than a
-simple `Map` since it is distributed. However, since `Region` implements `java.util.Map`, it can be treated as such.
-
-A complete discussion of `Region` and it concepts are beyond the scope of this document. You may learn more
-by reading Apache Geode’s User guide on [*Developing with Apache Geode*](https://geode.apache.org/docs/guide/14/developing/book_intro.html)
+create `Regions` which ultimately store the application’s data (state). Again, a `Region` is a Key/Value data
+structure, similar to a `java.util.Map`, mapping a Key to a Value or an Object.
 
 SBDG is opinionated and assumes most Apache Geode applications will be client applications in Apache Geode’s
 [*Topologies and Communication*](https://geode.apache.org/docs/guide/14/topologies_and_comm/book_intro.html)
@@ -250,8 +209,7 @@ Otherwise you would need to explicitly declare the `@ClientCacheApplication` ann
 
 ### Repository instance
 
-We are also using the Spring Data (Geode) *Repository* infrastructure in the Customer Service application. This should
-be evident from our declaration and definition of the application-specific `CustomerRepository` interface.
+We are also using the Spring Data (Geode) *Repository* infrastructure in the Customer Service application. 
 
 If we disable the Spring Data *Repository* *auto-configuration*:
 
@@ -313,9 +271,6 @@ attribute, or the equivalent, type-safe `basePackageClasses` attribute, to the p
 So far, the only explicit declaration of configuration in our Customer Service application is
 the `@EnableEntityDefinedRegions` annotation.
 
-As was alluded to above, there was another reason we explicitly declared the `@Region` annotation
-on our `Customer` class.
-
 Using SDG’s `@EnableEntityDefinedRegions` annotation is very convenient and can scan for the Regions
 (whether client or server (peer) Regions) required by your application based the entity classes themselves
 (e.g. `Customer`). In addition, we are going to take advantage of a very useful annotation for allowing SBDG to
@@ -338,9 +293,9 @@ However, the `@EnableEntityDefinedRegions` annotation only works when the entity
 annotated with the `@Region` annotation (e.g. `@Region("Customers")`), otherwise it ignores the class. You will find
 this annotation on Customer in the model package. 
 
-Initially we just want to get up and running as quickly as possible, without a lot of ceremony and fuss. By not starting
-a locator/reegion and using @EnableClusterAware we allow SBDG to detect that we are using a client `LOCAL` Region and we
-are not required to start a cluster of servers for the client to be able to store data. This allows rapid development
+**Enable Cluster Aware**
+Initially we want to get up and running as quickly as possible.  By not starting a locator/region and using @EnableClusterAware we allow SBDG to detect that we are using a client `LOCAL` Region and we
+are not required to start a cluster of Apache Geode servers for the client to be able to store data. This allows rapid local development
 for developers. 
 
 While client `LOCAL` Regions can be useful for some purposes (e.g. local processing, querying and aggregating of data),
@@ -354,9 +309,8 @@ We continue with our example by switching from a local context to a client/serve
 If you are rapidly prototyping and developing your application and simply want to lift off the ground quickly, then it
 is useful to start locally and gradually migrate towards a client/server architecture.
 
-To switch to client/server, all you need to do is startup a gfsh locator(s) and server(s) and SBDG will automatically
+To switch to client/server, all you need to do is startup a locator(s) and server(s) and SBDG will automatically
 detect your topology. 
-`@EnableEntityDefinedRegions` annotation declaration:
 
 **Client/Server Topology Region Configuration.**
 
@@ -367,32 +321,22 @@ detect your topology.
     class CustomerServiceApplication { }
 
 
-The ClusterAware auto configuration determines the topology by determining whether there is a cluster of servers to
-communicate with and to store/access data from. Clearly,there are no servers or cluster running yet.
+The @EnableClusterAware auto configuration determines the topology by determining whether there is a cluster of servers to
+communicate with and to store/access data from. 
 
-There are several ways in which to start a cluster. For example, you may use Spring to configure and bootstrap
-the cluster, which has been demonstrated [here](https://geode.apache.org/docs/guide/14/configuring/chapter_overview.html).
+There are several ways in which to start a cluster. For this example, we are going to use the tools provided with Apache Geode, or VMWare Tanzu  GemFire, i.e. *Gfsh* (GemFire/Geode Shell). For this workshop, we have installed GFSH for you.  
 
-Although, for this example, we are going to use the tools provided with Apache Geode, or VMWare Tanzu  GemFire, i.e. *Gfsh*
-(GemFire/Geode Shell) for reasons that will become apparent later.
-
-You need to [download](https://geode.apache.org/releases/) and [install](https://geode.apache.org/docs/guide/18/prereq_and_install.html)
-a full distribution of Apache Geode to make use of the provided tools. After installation, you will need to set
-the `GEODE` (or `GEMFIRE`) environment variable to the location of your installation. Additionally, add `$GEODE/bin`
-to your system `$PATH`.
-
-Once Apache Geode has been successfully installed, you can open a command prompt (terminal) and do:
+To start the command shell locally, open a command/terminal prompt and type
+$ gfsh
 
 **Running Gfsh.**
 
 
-
-    $ gfsh
         _________________________     __
        / _____/ ______/ ______/ /____/ /
       / /  __/ /___  /_____  / _____  /
      / /__/ / ____/  _____/ / /    / /
-    /______/_/      /______/_/    /_/    1.2.1
+    /______/_/      /______/_/    /_/    1.12.1
 
     Monitor and Manage Apache Geode
     gfsh>
@@ -402,7 +346,6 @@ You are set to go.
 The lab environment running on kubernetes was discussed in the lab setup.  Two locators and 2 servers have been started.
 
 Execute the *Gfsh* shell script using:
-
 
 With our gemfire-cluster create with an two Apache Geode Locators and (Cache) Servers running we can verify by listing
 and describing the members:
@@ -523,8 +466,10 @@ SDG is careful not to stomp on existing Regions since those Regions may have dat
 explicitly define and declare your Regions in production environments, either using *Gfsh* or Spring confg.
 
 It is now possible to replace the SDG `@EnableClusterConfiguration` annotation with SBDG’s `@EnableClusterAware`
-annotation as you see above in the src code, which has the same effect of pushing configuration metadata from the
-client to the server (or cluster). Additionally, SBDG’s `@EnableClusterAware` annotation makes it unnecessary to
+annotation as you see above, which has the same effect of pushing configuration metadata from the
+client to the server (or cluster). 
+
+SBDG’s `@EnableClusterAware` annotation makes it unnecessary to
 explicitly have to configure parameters like `clientRegionShortcut` on the SDG `@EnableEntityDefinedRegions`
 annotation (or similar annotation, e.g. SDG’s `@EnableCachingDefinedRegions`). Finally, because the SBDG's`
 @EnableClusterAware` annotation is meta-annotated with SDG’s `@EnableClusterConfiguration annotation` is automatically
@@ -594,13 +539,9 @@ What may not be apparent in this example up to this point is how the data got fr
 our client did send `Jon Doe` to the server, but our `Customer` class is not `java.io.Serializable`. So, how was an
 instance of `Customer` streamed and sent from the client to the server then (it is using a Socket)?
 
-Any object sent over a network, between two Java processes, or streamed to/from disk, must be serializable,
-no exceptions!
+Any object sent over a network, between two Java processes, or streamed to/from disk, must be serializable.
 
-Furthermore, when we started the cluster, we did not include any application domain classes on the classpath
-of any server in the cluster.
-
-As further evidence, we an adjust our query slightly:
+As further evidence, we can adjust our query slightly:
 
 **Invalid Query.**
 
@@ -619,7 +560,7 @@ If you tried to perform a `get`, you would hit a similar error:
 So, how was the data sent then? How were we able to access the data stored in the server(s) on the cluster with the
 OQL query `SELECT customer.name FROM /Customers customer` as seen above?
 
-Well, Apache Geode and Pivotal GemFire provide 2 proprietary serialization formats in addition to *Java Serialization*:
+Apache Geode and Tanzu GemFire provide 2 proprietary serialization formats in addition to *Java Serialization*:
 {apache-geode-docs}/developing/data\_serialization/gemfire\_data\_serialization.html\[Data Serialization\]
 and {apache-geode-docs}/developing/data\_serialization/gemfire\_pdx\_serialization.html\[PDX\], or *Portable Data Exchange*.
 
@@ -636,11 +577,6 @@ all application domain model types.
 
 If we were to disable PDX *auto-configuration*, you would see the effects of trying to serialize a non-serializable type,
 `Customer`.  This would be apparent when you tried to query /Customers. We will leave this as an exercise for the student. 
-
-
-SBDG takes care of all your serialization needs without you having to configure serialization or implement
-`java.io.Serializable` in all your application domain model types, including types your application domain model types
-might refer to, which may not be possible.
 
 If you were not using SBDG, then you would need to enable PDX serialization explicitly.
 
@@ -662,3 +598,4 @@ class with SDG’s `@EnablePdx` annotation, which is responsible for configuring
 SDG’s `MappingPdxSerializer`.
 
 [*Sample Applications*](https://docs.spring.io/spring-gemfire/docs/current/reference/html/#samples).
+
