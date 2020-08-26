@@ -3,6 +3,11 @@ build/
 out/
 target/
 bin/
+LocatorOne/
+ServerOne/
+*/caches/
+*/native/
+*/wrapper/
 
 .gradle
 .springBeans
