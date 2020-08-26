@@ -1,5 +1,5 @@
 # Gfsh shell script to start a simple GemFire/Geode cluster
 
 start locator --name=LocatorOne --log-level=config
-# configure pdx --read-serialized=true
+configure pdx --read-serialized=true
 start server --name=ServerOne --log-level=config

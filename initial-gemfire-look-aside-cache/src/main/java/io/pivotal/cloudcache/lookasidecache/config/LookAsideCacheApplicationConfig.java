@@ -22,11 +22,7 @@ import org.springframework.data.gemfire.config.annotation.EnableStatistics;
 import org.springframework.geode.config.annotation.EnableClusterAware;
 import org.springframework.web.client.RestTemplate;
 
-@Configuration
-@EnableCachingDefinedRegions
-@EnableStatistics
-@EnableClusterAware
-@EnablePdx
+
 public class LookAsideCacheApplicationConfig {
     @Bean
     public RestTemplate restTemplate() {

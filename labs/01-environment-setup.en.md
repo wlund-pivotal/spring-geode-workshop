@@ -10,14 +10,15 @@ to create a gemfire-cluster namespace.
 ## Apply the CRD for your Tanzu GemFire cluster, as in this development environment example:
 
 ```bash
-$ cat << EOF | kubectl -n gemfire-cluster apply -f -
+$ cat << EOF | kubectl  apply -f -
 apiVersion: core.geode.apache.org/v1alpha1
 kind: GeodeCluster
 metadata:
   name: gemfire1
 spec:
   exposeExternalManagement: true
-    replicas: 2
+  locators:
+    replicas: 1
   servers:
     replicas: 2
 EOF
@@ -33,7 +34,7 @@ metadata:
 spec:
   exposeExternalManagement: true
   locators:
-    replicas: 2
+    replicas: 1
   servers:
     replicas: 2
 ```
@@ -41,7 +42,14 @@ and create the gemfire-cluster with the following command:
 
 ```bash
 kubectl apply -f gemfire-cluster.yaml
+
+You can watch the progress of  your gemfire-cluster deployment by using a utility called k9s.  From the command line type:
+
+```bash
+k9s
 ```
+
+and you'll see the status of the nodes in your cluster and will be able to tell when all nodes are running. 
 
 ## Check the creation status of the Tanzu GemFire cluster:
 
