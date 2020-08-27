@@ -81,7 +81,8 @@ of bike incidents for a given zipcode and surrounding area.</p>
 
         JsonNode bikeIncidentsAsJsonNode = objectMapper.readTree(jsonIncidents);
 
-        <span class="hljs-built_in">List</span>&lt;BikeIncident&gt; bikeIncidents = objectMapper.convertValue(bikeIncidentsAsJsonNode.<span class="hljs-keyword">get</span>(<span class="hljs-string">"incidents"</span>),
+        <span class="hljs-built_in">List</span>&lt;BikeIncident&gt; bikeIncidents = objectMapper.
+               convertValue(bikeIncidentsAsJsonNode.<span class="hljs-keyword">get</span>(<span class="hljs-string">"incidents"</span>),
                 <span class="hljs-keyword">new</span> TypeReference&lt;<span class="hljs-built_in">List</span>&lt;BikeIncident&gt;&gt;(){});
 
         <span class="hljs-keyword">return</span> bikeIncidents;
@@ -123,7 +124,8 @@ of bike incidents for a given zipcode and surrounding area.</p>
         responseTimes.add( <span class="hljs-string">"Zip Code: "</span> + zipCode + <span class="hljs-string">", Response Time: "</span> + timeElapsed + <span class="hljs-string">" ms"</span>);
     }
 
-    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">populateModelWithSearchResults</span><span class="hljs-params">(Model model, List&lt;BikeIncident&gt; bikeIncidents, String zipCode)</span> </span>{
+    <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">populateModelWithSearchResults</span><span class="hljs-params">(Model model, List&lt;BikeIncident&gt; bikeIncidents,
+            String zipCode)</span> </span>{
         model.addAttribute(<span class="hljs-string">"zipCode"</span>, zipCode);
         model.addAttribute(<span class="hljs-string">"responseTimes"</span>, responseTimes);
         model.addAttribute(<span class="hljs-string">"bikeIncidents"</span>, bikeIncidents);

@@ -3,7 +3,9 @@
 This repo contains provides an example application demonstrating the use of
 Tanzu GemFire as a [look-aside cache](https://content.pivotal.io/blog/an-introduction-to-look-aside-vs-inline-caching-patterns).
 
-The application uses [Spring Boot for Apache Geode](https://docs.spring.io/autorepo/docs/spring-boot-data-geode-build/current/reference/html5/) to cache data from the Bikewise.org public REST API. Look-aside caching is enabled with just a few annotations. When serving cached data, the application response time is dramatically improved.
+The application uses [Spring Boot for Apache Geode](https://docs.spring.io/autorepo/docs/spring-boot-data-geode-build/current/reference/html5/)
+to cache data from the Bikewise.org public REST API. Look-aside caching is enabled with just a few annotations. When serving cached data,
+the application response time is dramatically improved.
 
 # How to get the app running on the local Env. 
 We are going to work now with an application that will use the look-aside features of gemfire caching.  A standard spring-mvc app employs the use
@@ -93,7 +95,8 @@ of bike incidents for a given zipcode and surrounding area.
 
         JsonNode bikeIncidentsAsJsonNode = objectMapper.readTree(jsonIncidents);
 
-        List<BikeIncident> bikeIncidents = objectMapper.convertValue(bikeIncidentsAsJsonNode.get("incidents"),
+        List<BikeIncident> bikeIncidents = objectMapper.
+			   convertValue(bikeIncidentsAsJsonNode.get("incidents"),
                 new TypeReference<List<BikeIncident>>(){});
 
         return bikeIncidents;
@@ -139,7 +142,8 @@ Add the following code to the class *ViewController* in the controllers package:
         responseTimes.add( "Zip Code: " + zipCode + ", Response Time: " + timeElapsed + " ms");
     }
 
-    private void populateModelWithSearchResults(Model model, List<BikeIncident> bikeIncidents, String zipCode) {
+    private void populateModelWithSearchResults(Model model, List<BikeIncident> bikeIncidents,
+    	    String zipCode) {
         model.addAttribute("zipCode", zipCode);
         model.addAttribute("responseTimes", responseTimes);
         model.addAttribute("bikeIncidents", bikeIncidents);
