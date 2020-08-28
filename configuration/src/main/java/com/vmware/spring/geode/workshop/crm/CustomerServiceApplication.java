@@ -72,15 +72,15 @@ public class CustomerServiceApplication {
 	ApplicationRunner runner(CustomerRepository customerRepository) {
 		
 		Fairy fairy = Fairy.create();
-
-		// Locating the max id to be enable incrementing of our ID. 
-		Long id = customerRepository.count();
 		
 		// Generate a random name from data generator
 		Person person = fairy.person();
 
 		return args -> {
-
+			// Locating the max id to be enable incrementing of our ID.
+			Long id = 0L;
+			id = customerRepository.count();
+			
 			assertThat(customerRepository.count()).isEqualTo(id);
 
 			Customer jonDoe = Customer.newCustomer(id + 1L, person.fullName());
