@@ -1,47 +1,73 @@
-<h1 id="spring-boot-auto-configuration-for-apache-geode-pivotal-gemfire">Spring Boot Auto-configuration for Apache Geode &amp; Pivotal GemFire</h1>
-<p>This lab is a modified version of the guide provided by John Blum at <a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples">apache-geode-docs</a></p>
-<p>This lab walks you through building a simple Customer Service, Spring Boot application using Apache Geode
+<h1 id="spring-boot-auto-configuration-for-tanzu-gemfire">Spring Boot Auto-configuration for Tanzu GemFire</h1>
+<p>Suppose we need to create a customer service application that stores customer data and allows the user to
+search for customers by name. This lab is a modified version of the guide provided by John Blum at
+<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html">apache-geode-docs</a></p>
+<p>We will walk you through building a simple Customer Service Spring Boot application using Apache Geode
 to manage Customer interactions. You should already be familiar with Spring Boot and Apache Geode.</p>
 <p>By the end of this lesson, you should have a better understanding of what Spring Boot for Apache Geode’s (SBDG)
-<em>auto-configuration</em> support actually does.</p>
-<p>This lab compliments the <a href="https://docs.spring.io/spring-boot-data-geode-build/1.1.x/reference/html5/configuration-annotations.html">Auto-configuration vs. Annotation-based configuration</a>
-chapter with concrete examples.</p>
-<p>This lab builds on the <a href="https://www.youtube.com/watch?v=OvY5wzCtOV0"><em>Simplifying Apache Geode with Spring Data</em></a>
-presentation by John Blum during the 2017 SpringOne Platform conference. While this example as well as the example
-presented in the talk both use Spring Boot, only this example is using Spring Boot for Apache Geode (SBDG). This guide
-improves on the example from the presentation by using SBDG.</p>
-<p>link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html</a></p>
-<p>link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples</a></p>
+<em>auto-configuration</em> support actually does. Additional resources can be found here:
+link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/guides/boot-configuration.html</a>
+link:<a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples">https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/index.html#geode-samples</a></p>
+<p>You can either work from an editor, vscode (code) or Spring Tool Suite. The directory for the first lab project
+can be found by:</p>
+<pre><code class="lang-bash"><span class="hljs-built_in">cd</span> spring-geode-workshop/configuration
+</code></pre>
+<p>Your choice of command line editors are</p>
+<ul>
+<li>emacs</li>
+<li>vi</li>
+</ul>
+<p>and your choice of IDEs available from the command line that are found on your $PATH are:</p>
+<ul>
+<li>SpringToolSuite4</li>
+<li>code</li>
+</ul>
+<p>The packages and classes have been previously created. You will want to review the code and pay special attention to the
+annotations for he respective stereotypes used in the solution for the lab.  In Visual Studio Code simply Open the Folder
+listed above and accept the prompts for the java and maven plugins.
+vscode project: <img src="/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/labs/images/vscode-open-auto-configuration-project.png" alt="Alt"></p>
+<p>Wih the configuration project open you will be able to navigate through the various packages to review the src code
+under the standard src folder (src/main/java) as shown below:</p>
+<p>Review Src Code: <img src="/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/labs/images/vscode-review-solution-src-code.png" alt="Alt"></p>
+<p>With Spring Tool Suite you follow a similar approach.</p>
+<ol>
+<li>Select Import an existing maven project and navigate to spring-geode-workshop/configuration as shown below:
+<img src="/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/labs/images/sts-navigate-folder-to-import.png" alt="Alt"></li>
+<li>Then import the mvn project.  You will see the project configure and compile the mvn project.
+<img src="/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/labs/images/sts-import-mvn-project.png" alt="Alt"></li>
+<li>Review the project source code packages and classes: :
+<img src="/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/labs/images/sts-review-src-code.png" alt="Alt"></li>
+</ol>
 <h2 id="application-domain-classes">Application Domain Classes</h2>
-<p>We will build the Spring Boot, Customer Service application from the ground up.</p>
+<p>We will review the src code from the view of building the Spring Boot, Customer Service application from the ground up.</p>
 <h3 id="-customer-class"><code>Customer</code> class</h3>
-<p>Like any sensible application development project, we begin by modeling the data our application needs to manage,
-namely a <code>Customer</code>. For this example, the <code>Customer</code> class is implemented as follows:</p>
+<p>First, we need to define an application domain object to encapsulate customer information. We begin by modeling the data our
+application needs to manage, namely a <code>Customer</code>. For this example, the <code>Customer</code> class is implemented as follows:</p>
 <p><strong>Customer class.</strong></p>
-<pre><code><span class="hljs-variable">@Region</span>(<span class="hljs-string">"Customers"</span>)
-<span class="hljs-variable">@EqualsAndHashCode</span>
-<span class="hljs-variable">@ToString</span>(of = <span class="hljs-string">"name"</span>)
-<span class="hljs-variable">@RequiredArgsConstructor</span>(staticName = <span class="hljs-string">"newCustomer"</span>)
-public class Customer {
+<pre><code class="lang-java">@Region(<span class="hljs-string">"Customers"</span>)
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Customer</span>&lt;<span class="hljs-title">T</span>&gt; </span>{
 
-    <span class="hljs-variable">@Id</span> <span class="hljs-variable">@NonNull</span> <span class="hljs-variable">@Getter</span>
-    private Long id;
+    @Id
+    <span class="hljs-keyword">private</span> Long id;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">String</span> name;
 
-    <span class="hljs-variable">@NonNull</span> <span class="hljs-variable">@Getter</span>
-    private String name;
+    <span class="hljs-keyword">private</span> Customer(Long id, <span class="hljs-keyword">String</span> name) {
+        <span class="hljs-keyword">if</span> ((id == <span class="hljs-literal">null</span>) ||name == <span class="hljs-literal">null</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-type">NullPointerException</span>(<span class="hljs-string">"name required"</span>);
+        <span class="hljs-built_in">this</span>.id = id;
+        <span class="hljs-built_in">this</span>.name = (<span class="hljs-keyword">String</span>) name;
+    }
 
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;T&gt; Customer&lt;T&gt; <span class="hljs-keyword">new</span><span class="hljs-type">Customer</span>(Long id, <span class="hljs-keyword">String</span> name) {
+         <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-type">Customer</span>&lt;T&gt;(id, name);
+        }
 }
-</code></pre><p>The <code>Customer</code> class uses <a href="https://projectlombok.org/">Project Lombok</a> to simplify the implementation so we can focus on
-the details we care about. Lombok is useful for testing or prototyping purposes. However, using Project Lombok is
-optional and in most production applications, and I would not recommend it.</p>
-<p>Additionally, the <code>Customer</code> class is annotated with Spring Data Geode’s (SDG) <code>@Region</code> annotation. <code>@Region</code>
-is a mapping annotation declaring the Apache Geode cache <code>Region</code> in which <code>Customer</code> data will be persisted.</p>
-<p>Finally, the <code>org.springframework.data.annotation.Id</code> annotation was used to designate the <code>Customer.id</code> field as
+</code></pre>
+<p>The <code>Customer</code> class is annotated with Spring Data Geode’s (SDG) <code>@Region</code> annotation. <code>@Region</code>
+is a mapping annotation declaring the Apache Geode cache <code>Region</code> in which <code>Customer</code> data will
+be persisted.  A <code>Region</code> is a distributed version of <code>java.util.Map</code>.</p>
+<p>Tthe <code>@Id</code> annotation is used to designate the <code>Customer.id</code> field as
 the identifier for <code>Customer</code> objects. The identifier is the Key used in the Entry stored in the &quot;Customers&quot;`Region`.
 A <code>Region</code> is a distributed version of <code>java.util.Map</code>.</p>
-<p>If the <code>@Region</code> annotation is not explicitly declared, then SDG uses the simple name of the class, which in this
-case is &quot;Customer&quot;, to identify the <code>Region</code>. However, there is another reason we explicitly annotated the <code>Customer</code>
-class with <code>@Region</code>, which we will cover below.</p>
 <h3 id="-customerrepository-interface"><code>CustomerRepository</code> interface</h3>
 <p>Next, we create a <em>Data Access Object</em> (DAO) to persist <code>Customers</code> to Apache Geode. We create the DAO
 using Spring Data’s <em>Repository</em> abstraction:</p>
@@ -57,17 +83,13 @@ and DELETE) data access operations along with the ability to define simple queri
 any query methods you may have explicitly defined on the interface in addition to the data access operations provided in
 the <code>CrudRepository</code> interface extension.</p>
 <p>In addition to the base <code>CrudRepository</code> operations, <code>CustomerRepository</code> has additionally defined a
-<code>findByNameLike(:String):Customer</code> query method. The Apache Geode OQL query is derived from the method declaration.</p>
-<p>Though it is beyond the scope of this document, Spring Data’s <em>Repository</em> infrastructure is capable of generating
-data store specific queries (e.g. Apache Geode OQL) for <em>Repository</em> interface query method declarations just by
-introspecting the method signature. The query methods must conform to specific conventions. Alternatively, users
-may use <code>@Query</code> to annotate query methods to specify the raw query instead (i.e. OQL for Apache Geode, SQL for JDBC,
-possibly HQL for JPA, and so on).</p>
+<code>findByNameLike(:String):Customer</code> query method. </p>
 <h3 id="-customerserviceapplication-spring-boot-main-class-"><code>CustomerServiceApplication</code> (Spring Boot main class)</h3>
 <p>Now that we have created the basic domain classes of our Customer Service application, we need a main application class
 to drive the interactions with Customers:</p>
 <p><strong>CustomerServiceApplication class.</strong></p>
-<pre><code>@<span class="hljs-type">SpringBootApplication</span>
+<p><strong>CustomerServiceApplication class.</strong></p>
+<pre><code class="lang-java">@<span class="hljs-type">SpringBootApplication</span>
 @<span class="hljs-type">EnableClusterAware</span>
 @<span class="hljs-type">EnableEntityDefinedRegions</span>(basePackageClasses = <span class="hljs-type">Customer</span>.<span class="hljs-keyword">class</span>)
 public <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CustomerServiceApplication</span> {</span>
@@ -83,208 +105,121 @@ public <span class="hljs-class"><span class="hljs-keyword">class</span> <span cl
     @<span class="hljs-title">Bean</span>
     <span class="hljs-title">ApplicationRunner</span> <span class="hljs-title">runner</span>(<span class="hljs-type">CustomerRepository</span> customerRepository) {
 
-        <span class="hljs-title">return</span> <span class="hljs-title">args</span> -&gt; {
+        <span class="hljs-title">Fairy</span> <span class="hljs-title">fairy</span> = <span class="hljs-title">Fairy</span>.<span class="hljs-title">create</span>();
 
-            <span class="hljs-title">assertThat</span>(customerRepository.count()).<span class="hljs-title">isEqualTo</span>(<span class="hljs-number">0</span>);
+        <span class="hljs-comment">// Generate a random name from data generator</span>
+        <span class="hljs-title">Person</span> <span class="hljs-title">person</span> = <span class="hljs-title">fairy</span>.<span class="hljs-title">person</span>();
 
-            <span class="hljs-title">Customer</span> <span class="hljs-title">jonDoe</span> = <span class="hljs-title">Customer</span>.<span class="hljs-title">newCustomer</span>(<span class="hljs-number">1</span>L, "<span class="hljs-type">Jon</span> <span class="hljs-type">Doe</span>");
 
-            <span class="hljs-title">System</span>.<span class="hljs-title">err</span>.<span class="hljs-title">printf</span>("<span class="hljs-type">Saving</span> <span class="hljs-type">Customer</span> [%s]%n", jonDoe);
+    <span class="hljs-title">return</span> <span class="hljs-title">args</span> -&gt; {
+            <span class="hljs-comment">// Locating the max id to be enable incrementing of our ID.</span>
+            <span class="hljs-title">Long</span> <span class="hljs-title">id</span> = 0<span class="hljs-title">L</span>;
+            <span class="hljs-title">id</span> = <span class="hljs-title">customerRepository</span>.<span class="hljs-title">count</span>();
 
-            <span class="hljs-title">jonDoe</span> = <span class="hljs-title">customerRepository</span>.<span class="hljs-title">save</span>(jonDoe);
+            <span class="hljs-title">assertThat</span>(customerRepository.count()).<span class="hljs-title">isEqualTo</span>(id);
 
-            <span class="hljs-title">assertThat</span>(jonDoe).<span class="hljs-title">isNotNull</span>();
-            <span class="hljs-title">assertThat</span>(jonDoe.getId()).<span class="hljs-title">isEqualTo</span>(<span class="hljs-number">1</span>L);
-            <span class="hljs-title">assertThat</span>(jonDoe.getName()).<span class="hljs-title">isEqualTo</span>("<span class="hljs-type">Jon</span> <span class="hljs-type">Doe</span>");
-            <span class="hljs-title">assertThat</span>(customerRepository.count()).<span class="hljs-title">isEqualTo</span>(<span class="hljs-number">1</span>);
+            <span class="hljs-title">Customer</span> <span class="hljs-title">randomCustomer</span> = <span class="hljs-title">Customer</span>.<span class="hljs-title">newCustomer</span>(id + <span class="hljs-number">1</span>L, person.fullName());
 
-            <span class="hljs-title">System</span>.<span class="hljs-title">err</span>.<span class="hljs-title">println</span>("<span class="hljs-type">Querying</span> for <span class="hljs-type">Customer</span> [<span class="hljs-type">SELECT</span> * <span class="hljs-type">FROM</span> /<span class="hljs-type">Customers</span> <span class="hljs-type">WHERE</span> name <span class="hljs-type">LIKE</span> '%<span class="hljs-type">Doe</span>']");
+            <span class="hljs-title">System</span>.<span class="hljs-title">err</span>.<span class="hljs-title">printf</span>("<span class="hljs-type">Saving</span> <span class="hljs-type">Customer</span> [%s]%n", randomCustomer);
 
-            <span class="hljs-title">Customer</span> <span class="hljs-title">queriedJonDoe</span> = <span class="hljs-title">customerRepository</span>.<span class="hljs-title">findByNameLike</span>("%<span class="hljs-type">Doe</span>");
+            <span class="hljs-title">randomCustomer</span> = <span class="hljs-title">customerRepository</span>.<span class="hljs-title">save</span>(randomCustomer);
 
-            <span class="hljs-title">assertThat</span>(queriedJonDoe).<span class="hljs-title">isEqualTo</span>(jonDoe);
+            <span class="hljs-title">assertThat</span>(randomCustomer).<span class="hljs-title">isNotNull</span>();
+            <span class="hljs-title">assertThat</span>(randomCustomer.getId()).<span class="hljs-title">isEqualTo</span>(id + <span class="hljs-number">1</span>);
+            <span class="hljs-title">assertThat</span>(randomCustomer.getName()).<span class="hljs-title">isEqualTo</span>(person.fullName());
+            <span class="hljs-title">assertThat</span>(customerRepository.count()).<span class="hljs-title">isEqualTo</span>(randomCustomer.getId());
 
-            <span class="hljs-title">System</span>.<span class="hljs-title">err</span>.<span class="hljs-title">printf</span>("<span class="hljs-type">Customer</span> was [%s]%n", queriedJonDoe);
+            <span class="hljs-title">String</span> <span class="hljs-title">query</span> = "<span class="hljs-title">Querying</span> <span class="hljs-title">for</span> <span class="hljs-title">Customer</span> [<span class="hljs-title">SELECT</span> * <span class="hljs-title">FROM</span> /<span class="hljs-title">Customers</span> <span class="hljs-title">WHERE</span> <span class="hljs-title">name</span> <span class="hljs-title">LIKE</span> " + <span class="hljs-title">randomCustomer</span>.<span class="hljs-title">getName</span>() + "]";
+            <span class="hljs-title">System</span>.<span class="hljs-title">err</span>.<span class="hljs-title">println</span>(query);
+
+            <span class="hljs-title">Customer</span> <span class="hljs-title">queriedrandomCustomer</span> = <span class="hljs-title">customerRepository</span>.<span class="hljs-title">findByNameLike</span>(person.fullName());
+
+            <span class="hljs-title">assertThat</span>(queriedrandomCustomer).<span class="hljs-title">isEqualTo</span>(randomCustomer);
+
+            <span class="hljs-title">System</span>.<span class="hljs-title">err</span>.<span class="hljs-title">printf</span>("<span class="hljs-type">Customer</span> was [%s]%n", queriedrandomCustomer);
         };
     }
 }</span>
-</code></pre><p>The <code>CustomerServiceApplication</code> class is annotated with <code>@SpringBootApplication</code>. Therefore, the main class is
+</code></pre>
+<p>The <code>CustomerServiceApplication</code> class is annotated with <code>@SpringBootApplication</code>. Therefore, the main class is
 a proper Spring Boot application equipped with all the features of Spring Boot (e.g. <em>auto-configuration</em>).</p>
-<p>Additionally, we use Spring Boot’s <code>SpringApplicationBuilder</code> in the <code>main</code> method to configure and bootstrap
+<p>We then use a @ClusterAware annotation.  &quot;The @EnableClusterAware annotation is arguably the most powerful and 
+valuable Annotation in the set of Annotations!&quot; - <a href="https://docs.spring.io/spring-boot-data-geode-build/current/reference/html5/#geode-configuration-declarative-annotations-productivity-enableclusteraware">See here</a>.</p>
+<p>We use @EnableEntityDefinedRegions(basePackageClasses = Customer.class) to locate our Domain class
+that has our region annotation so that the Region will be created in whatever topology is deployed. </p>
+<p>We use Spring Boot’s <code>SpringApplicationBuilder</code> in the <code>main</code> method to configure and bootstrap
 the Customer Service application.</p>
 <p>Then, we declare a Spring Boot <code>ApplicationRunner</code> bean, which is invoked by Spring Boot after the Spring container
 (i.e. <code>ApplicationContext</code>) has been properly initialized and started. Our <code>ApplicationRunner</code> defines the Customer
 interactions performed by our Customer Service application.</p>
-<p>Specifically, the runner creates a new <code>Customer</code> object (&quot;Jon Doe&quot;), saves him to the &quot;Customers&quot; Region, and then
-queries for &quot;Jon Doe&quot; using an OQL query with the predicate: <code>name LIKE &#39;%Doe&#39;</code>.</p>
+<p>Specifically, the runner creates a new random <code>Customer</code> object generated through a mock data generator
+called <a href="https://github.com/Devskiller/jfairy_ saves him to the &quot;Customers&quot; Region, and then
+queries for name that was generated by jfairy using an OQL query with the predicate: `name LIKE &#39;randomCustomer.getName(">jfairy</a>&#39;`.</p>
 <p><code>%</code> is the wildcard for OQL text searches.</p>
 <h2 id="running-the-example">Running the Example</h2>
-<p>You can run the <code>CustomerServiceApplication</code> class from your IDE (e.g. Spring Tool Suite or IntelliJ IDEA) or from the command-line with
-the <code>mvn clean package</code> followed by the command.</p>
-<p>There is nothing special you must do to run the <code>CustomerServiceApplication</code> class from inside your IDE. Simply create
-a run profile configuration and run it.</p>
-<p>There is also nothing special about running the <code>CustomerServiceApplication</code> class from the command-line using <code>mvn</code>.
-Simply execute it with <code>spring-boot:bootRun</code>:</p>
-<p>`$ mvn spring-boot:run</p>
-<p>If you wish to adjust the log levels for either Apache Geode or Spring Boot while running the example, then you can set
-the log level for the individual Loggers (i.e. <code>org.apache</code> or <code>org.springframework</code>)
-in <code>src/main/resources/logback.xml</code>:</p>
-<p><strong>spring-geode-samples/boot/configuration/src/main/resources/logback.xml.</strong></p>
-<pre><code><span class="hljs-symbol">include:</span><span class="hljs-symbol">:/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/configuration/src/main/resources/logback</span>.xml
-</code></pre><h2 id="auto-configuration-for-apache-geode-take-one">Auto-configuration for Apache Geode, Take One</h2>
-<p>&quot;<em>With great power comes great responsibility.</em>&quot; - Uncle Ben</p>
-<p>While it is not apparent (yet), there is a lot of hidden, intrinsic power provided by Spring Boot Data Geode (SBDG)
+<h3 id="running-within-the-ide">Running within the IDE</h3>
+<p>You can run the <code>CustomerServiceApplication</code> class from your IDE (e.g. Spring Tool Suite or IntelliJ IDEA).
+From the IDE (STS) you can right click on the main class and runa spring boot app.
+STS run command: <img src="/Users/wlund/Dropbox/git-workspace/wxlund/spring-geode-workshop/labs/images/run-spring-boot-app.png" alt="Alt"></p>
+<h3 id="running-from-the-command-line">Running from the command line</h3>
+<pre><code class="lang-bash">mvn clean <span class="hljs-class"><span class="hljs-keyword">package</span>`</span>
+</code></pre>
+<p>Then run the <code>CustomerServiceApplication</code> class from the command-line using the command </p>
+<pre><code class="lang-bash">$ mvn spring-boot:<span class="hljs-keyword">run</span><span class="bash"></span>
+</code></pre>
+<p>We have just run our application taking advantage of SBDG to automatically detect that we are in local mode
+with no connection to a gemfire cluster.  SBDG will create our region for us in memory and store our data
+in a local cache or some refer to this configuration as a near cache.</p>
+<h2 id="auto-configuration-for-apache-geode-take-one">Auto-configuration for Apache Geode, Take One</h2>
+<p>While it is not apparent, there is a lot of hidden, intrinsic power provided by Spring Boot Data Geode (SBDG)
 in this example.</p>
 <h3 id="cache-instance">Cache instance</h3>
 <p>First, in order to put anything into Apache Geode you need a cache instance. A cache instance is also required to
-create <code>Regions</code> which ultimately store the application’s data (state). Again, a <code>Region</code> is just a Key/Value data
-structure, like <code>java.util.Map</code>, mapping a Key to a Value, or an Object. A <code>Region</code> is actually much more than a
-simple <code>Map</code> since it is distributed. However, since <code>Region</code> implements <code>java.util.Map</code>, it can be treated as such.</p>
-<p>A complete discussion of <code>Region</code> and it concepts are beyond the scope of this document. You may learn more
-by reading Apache Geode’s User guide on <a href="https://geode.apache.org/docs/guide/14/developing/book_intro.html"><em>Developing with Apache Geode</em></a></p>
+create <code>Regions</code> which ultimately store the application’s data (state). Again, a <code>Region</code> is a Key/Value data
+structure, similar to a <code>java.util.Map</code>, mapping a Key to a Value or an Object.</p>
 <p>SBDG is opinionated and assumes most Apache Geode applications will be client applications in Apache Geode’s
 <a href="https://geode.apache.org/docs/guide/14/topologies_and_comm/book_intro.html"><em>Topologies and Communication</em></a>
-Therefore, SBDG auto-configures a <code>ClientCache</code> instance by default.</p>
-<p>The intrinsic <code>ClientCache</code> <em>auto-configuration</em> provided by SBDG can be made apparent by disabling it:</p>
-<p><strong>Disabling ClientCache Auto-configuration.</strong></p>
-<pre><code><span class="hljs-variable">@SpringBootApplication</span>(exclude = ClientCacheAutoConfiguration.class)
-<span class="hljs-variable">@EnableEntityDefinedRegions</span>(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
-public class CustomerServiceApplication {
-  <span class="hljs-comment">// ...</span>
-}
-</code></pre><p>Note the <code>exclude</code> on the <code>ClientCacheAutoConfiguration.class</code>.</p>
-<p>With the correct log level set, you will see an error message similar to:</p>
-<p><strong>Error resulting from no ClientCache instance.</strong></p>
-<p>2020-08-24 17:26:20,964 ERROR agnostics.LoggingFailureAnalysisReporter:  40 - </p>
-<hr>
-<p>APPLICATION FAILED TO START</p>
-<hr>
-<p>Description:</p>
-<p>Parameter 0 of method runner in com.vmware.spring.geode.workshop.crm.CustomerServiceApplication required a bean of type &#39;com.vmware.spring.geode.workshop.crm.repo.CustomerRepository&#39; that could not be found.</p>
-<p>Action:</p>
-<p>Consider defining a bean of type &#39;com.vmware.spring.geode.workshop.crm.repo.CustomerRepository&#39; in your configuration.</p>
-<p>Essentially, the <code>CustomerRepository</code> could not be injected into our <code>CustomerServiceApplication</code> class,
-<code>ApplicationRunner</code> bean method because the <code>CustomerRepository</code>, which depends on the &quot;Customers&quot; Region,
-could not be created. The <code>CustomerRepository</code> could not be created because the &quot;Customers&quot; Region
-could not be created. The &quot;Customers&quot; Region could not be created because there was no cache instance available
-(e.g. <code>ClientCache</code>) to create <code>Regions</code>, resulting in a trickling effect.</p>
-<p>We are going to take advantage of an annotation that allows our developer environment to determine what environment
-we are running in and create a local (near) cache or a client server connection through auto configuration via the
-following:</p>
-<p><strong>Equivalent ClientCache configuration.</strong></p>
-<pre><code><span class="hljs-variable">@SpringBootApplication</span>
-<span class="hljs-variable">@EnableClusterAware</span>
-<span class="hljs-variable">@EnableEntityDefinedRegions</span>(basePackageClasses = Customer.class)
-public class CustomerServiceApplication {
-  <span class="hljs-comment">// ...</span>
-}
-</code></pre><p>Otherwise you would need to explicitly declare the <code>@ClientCacheApplication</code> annotation if you were not using SBDG.</p>
-<h3 id="repository-instance">Repository instance</h3>
-<p>We are also using the Spring Data (Geode) <em>Repository</em> infrastructure in the Customer Service application. This should
-be evident from our declaration and definition of the application-specific <code>CustomerRepository</code> interface.</p>
-<p>If we disable the Spring Data <em>Repository</em> <em>auto-configuration</em>:</p>
-<p><strong>Disabling Spring Data Repositories Auto-configuration.</strong></p>
-<pre><code><span class="hljs-variable">@SpringBootApplication</span>(exclude = RepositoriesAutoConfiguration.class)
-<span class="hljs-variable">@EnableEntityDefinedRegions</span>(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
-public class CustomerServiceApplication {
-  <span class="hljs-comment">// ...</span>
-}
-</code></pre><p>The application would throw a similar error on startup:</p>
-<p>2020-08-24 17:38:49,107  INFO xt.annotation.ConfigurationClassEnhancer: 323 - @Bean method PdxConfiguration.pdxDiskStoreAwareBeanFactoryPostProcessor is non-static and returns an object assignable to Spring&#39;s BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method&#39;s declaring @Configuration class. Add the &#39;static&#39; modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
-2020-08-24 17:38:49,112  INFO xt.annotation.ConfigurationClassEnhancer: 323 - @Bean method RegionTemplateAutoConfiguration.regionTemplateBeanFactoryPostProcessor is non-static and returns an object assignable to Spring&#39;s BeanFactoryPostProcessor interface. This will result in a failure to process annotations such as @Autowired, @Resource and @PostConstruct within the method&#39;s declaring @Configuration class. Add the &#39;static&#39; modifier to this method to avoid these container lifecycle issues; see @Bean javadoc for complete details.
-2020-08-24 17:38:49,184  INFO trationDelegate$BeanPostProcessorChecker: 335 - Bean &#39;org.springframework.geode.boot.autoconfigure.DataImportExportAutoConfiguration&#39; of type [org.springframework.geode.boot.autoconfigure.DataImportExportAutoConfiguration$$EnhancerBySpringCGLIB$$cb0836d1] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
-2020-08-24 17:38:49,229  WARN ation.AnnotationConfigApplicationContext: 559 - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name &#39;runner&#39; defined in com.vmware.spring.geode.workshop.crm.CustomerServiceApplication: Unsatisfied dependency expressed through method &#39;runner&#39; parameter 0; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type &#39;com.vmware.spring.geode.workshop.crm.repo.CustomerRepository&#39; available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
-2020-08-24 17:38:49,236  INFO ConditionEvaluationReportLoggingListener: 136 - </p>
-<p>Error starting ApplicationContext. To display the conditions report re-run your application with &#39;debug&#39; enabled.
-2020-08-24 17:38:49,307 ERROR agnostics.LoggingFailureAnalysisReporter:  40 - </p>
-<hr>
-<p>APPLICATION FAILED TO START</p>
-<hr>
-<p>Description:</p>
-<p>Parameter 0 of method runner in com.vmware.spring.geode.workshop.crm.CustomerServiceApplication required a bean of type &#39;com.vmware.spring.geode.workshop.crm.repo.CustomerRepository&#39; that could not be found.</p>
-<p>Action:</p>
-<p>Consider defining a bean of type &#39;com.vmware.spring.geode.workshop.crm.repo.CustomerRepository&#39; in your configuration.</p>
-<p>In this case, there was simply no proxy implementation for the <code>CustomerRepository</code> interface provided by the framework
-since the <em>auto-configuration</em> was disabled. The <code>ClientCache</code> and &quot;Customers&quot; <code>Region</code> do exist in this case, though.</p>
-<p>The Spring Data <em>Repository auto-configuration</em> even takes care of locating our application <em>Repository</em> interface
-definitions for us.</p>
-<p>Without <em>auto-configuration</em>, you would need to explicitly:</p>
-<p><strong>Equivalent Spring Data Repositories configuration.</strong></p>
-<pre><code><span class="hljs-variable">@SpringBootApplication</span>(exclude = RepositoriesAutoConfiguration.class)
-<span class="hljs-variable">@EnableEntityDefinedRegions</span>(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
-<span class="hljs-variable">@EnableGemfireRepositories</span>(basePackageClasses = CustomerRepository.class)
-public class CustomerServiceApplication {
-  <span class="hljs-comment">// ...</span>
-}
-</code></pre><p>That is, you would need to explicitly declare the <code>@EnableGemfireRepositories</code> annotation and set the <code>basePackages</code>
-attribute, or the equivalent, type-safe <code>basePackageClasses</code> attribute, to the package containing your application
-<em>Repository</em> interfaces, if you were not using SBDG.</p>
-<h3 id="entity-defined-regions">Entity-defined Regions</h3>
-<p>So far, the only explicit declaration of configuration in our Customer Service application is
-the <code>@EnableEntityDefinedRegions</code> annotation.</p>
-<p>As was alluded to above, there was another reason we explicitly declared the <code>@Region</code> annotation
-on our <code>Customer</code> class.</p>
-<p>Using SDG’s <code>@EnableEntityDefinedRegions</code> annotation is very convenient and can scan for the Regions
-(whether client or server (peer) Regions) required by your application based the entity classes themselves
-(e.g. <code>Customer</code>). In addition, we are going to take advantage of a very useful annotation for allowing SBDG to
-automatically detect our topolocy (e.g. local/near cache or client server):</p>
-<p><strong>Annotation-based config for the &quot;Customers&quot; Region.</strong></p>
-<pre><code><span class="hljs-variable">@SpringBootApplication</span>
-<span class="hljs-variable">@EnableClusterAware</span>
-<span class="hljs-variable">@EnableEntityDefinedRegions</span>(basePackageClasses = Customer.class)
-class CustomerServiceApplication { }
-</code></pre><p>The <code>basePackageClasses</code> attribute is an alternative to <code>basePackages</code>, and a type-safe way to target the packages
-(and subpackages) containing the entity classes that your application will persist to Apache Geode. You only need to
-choose one class from each top-level package for where you want the scan to begin. Spring Data Geode uses this class
-to determine the package to begin the scan. &#39;basePackageClasses` accepts an array of <code>Class</code> types so you can specify
-multiple independent top-level packages. The annotation also includes the ability to filter types.</p>
-<p>However, the <code>@EnableEntityDefinedRegions</code> annotation only works when the entity class (e.g. <code>Customer</code>) is explicitly
-annotated with the <code>@Region</code> annotation (e.g. <code>@Region(&quot;Customers&quot;)</code>), otherwise it ignores the class. You will find
-this annotation on Customer in the model package. </p>
-<p>Initially we just want to get up and running as quickly as possible, without a lot of ceremony and fuss. By not starting
-a locator/reegion and using @EnableClusterAware we allow SBDG to detect that we are using a client <code>LOCAL</code> Region and we
-are not required to start a cluster of servers for the client to be able to store data. This allows rapid development
-for developers. </p>
+Therefore, SBDG auto-configures a <code>ClientCache</code> instance by default. You can disable these features by
+adding:</p>
+<pre><code class="lang-java">    @<span class="hljs-keyword">SpringBootApplication</span>(<span class="hljs-keyword">exclude</span> = ClientCacheAutoConfiguration.class)
+</code></pre>
+<p>but in most case there is an easier way to move from a local ClientCache to a Client/Server Topology.</p>
+<p>Without <em>auto-configuration</em> settin gup and runnning this quickly would not be possible. SBDG assumes
+standard practices for the gemfire developer to be able to begin being productive immediately when using
+Spring Boot</p>
+<h2 id="switching-to-client-server">Switching to Client/Server</h2>
+<p>Initially we want to get up and running as quickly as possible.  By not starting a locator/region and using
+<em>@EnableClusterAware</em> we allow SBDG to detect that we are using a client <code>LOCAL</code> Region and we are not
+required to start a cluster of Gemfire servers for the client to be able to store data. This allows
+rapid local development for developers. </p>
 <p>While client <code>LOCAL</code> Regions can be useful for some purposes (e.g. local processing, querying and aggregating of data),
 it is more common for a client to persist data in a cluster of servers, and for that data to be shared by multiple
 clients (instances) in the application architecture, especially as the application is scaled out to handle demand.</p>
-<h2 id="switching-to-client-server">Switching to Client/Server</h2>
 <p>We continue with our example by switching from a local context to a client/server topology.</p>
 <p>If you are rapidly prototyping and developing your application and simply want to lift off the ground quickly, then it
 is useful to start locally and gradually migrate towards a client/server architecture.</p>
-<p>To switch to client/server, all you need to do is startup a gfsh locator(s) and server(s) and SBDG will automatically
-detect your topology. 
-<code>@EnableEntityDefinedRegions</code> annotation declaration:</p>
-<p><strong>Client/Server Topology Region Configuration.</strong></p>
-<pre><code><span class="hljs-variable">@SpringBootApplication</span>
-<span class="hljs-variable">@EnableClusterAware</span>
-<span class="hljs-variable">@EnableEntityDefinedRegions</span>(basePackageClasses = Customer.class)
-
-class CustomerServiceApplication { }
-</code></pre><p>The ClusterAware auto configuration determines the topology by determining whether there is a cluster of servers to
-communicate with and to store/access data from. Clearly,there are no servers or cluster running yet.</p>
-<p>There are several ways in which to start a cluster. For example, you may use Spring to configure and bootstrap
-the cluster, which has been demonstrated <a href="https://geode.apache.org/docs/guide/14/configuring/chapter_overview.html">here</a>.</p>
-<p>Although, for this example, we are going to use the tools provided with Apache Geode, or VMWare Tanzu  GemFire, i.e. <em>Gfsh</em>
-(GemFire/Geode Shell) for reasons that will become apparent later.</p>
-<p>You need to <a href="https://geode.apache.org/releases/">download</a> and <a href="https://geode.apache.org/docs/guide/18/prereq_and_install.html">install</a>
-a full distribution of Apache Geode to make use of the provided tools. After installation, you will need to set
-the <code>GEODE</code> (or <code>GEMFIRE</code>) environment variable to the location of your installation. Additionally, add <code>$GEODE/bin</code>
-to your system <code>$PATH</code>.</p>
-<p>Once Apache Geode has been successfully installed, you can open a command prompt (terminal) and do:</p>
+<p>To switch to client/server, all you need to do is startup a locator(s) and server(s) and SBDG will automatically
+detect your topology. </p>
+<p>There are several ways in which to start a cluster. For this example, we are going to use the tools provided with
+Tanzu Gemfire, i.e. <em>Gfsh</em> (GemFire/Geode Shell). For this workshop, we have installed GFSH for you.  </p>
+<p>To start the command shell locally, open a command/terminal prompt and type
+$ gfsh</p>
 <p><strong>Running Gfsh.</strong></p>
-<pre><code>$ gfsh
-    _________________________     __
-   <span class="hljs-regexp">/ _____/</span> ______<span class="hljs-regexp">/ ______/</span> <span class="hljs-regexp">/____/</span> /
-  <span class="hljs-regexp">/ /</span>  __<span class="hljs-regexp">/ /</span>___  <span class="hljs-regexp">/_____  /</span> _____  /
- <span class="hljs-regexp">/ /</span>__<span class="hljs-regexp">/ /</span> ____<span class="hljs-regexp">/  _____/</span> <span class="hljs-regexp">/ /</span>    <span class="hljs-regexp">/ /</span>
-<span class="hljs-regexp">/______/</span>_<span class="hljs-regexp">/      /</span>______<span class="hljs-regexp">/_/</span>    <span class="hljs-regexp">/_/</span>    <span class="hljs-number">1.2</span><span class="hljs-number">.1</span>
+<pre><code class="lang-shell">        _________________________     __
+       <span class="hljs-regexp">/ _____/</span> ______<span class="hljs-regexp">/ ______/</span> <span class="hljs-regexp">/____/</span> /
+      <span class="hljs-regexp">/ /</span>  __<span class="hljs-regexp">/ /</span>___  <span class="hljs-regexp">/_____  /</span> _____  /
+     <span class="hljs-regexp">/ /</span>__<span class="hljs-regexp">/ /</span> ____<span class="hljs-regexp">/  _____/</span> <span class="hljs-regexp">/ /</span>    <span class="hljs-regexp">/ /</span>
+    <span class="hljs-regexp">/______/</span>_<span class="hljs-regexp">/      /</span>______<span class="hljs-regexp">/_/</span>    <span class="hljs-regexp">/_/</span>    <span class="hljs-number">1.12</span><span class="hljs-number">.1</span>
 
-Monitor and Manage Apache Geode
-gfsh&gt;
-</code></pre><p>You are set to go.</p>
-<p>The lab environment running on kubernetes was discussed in the lab setup.  Two locators and 2 servers have been started.</p>
-<p>Execute the <em>Gfsh</em> shell script using:</p>
+    Monitor and Manage Apache Geode
+    gfsh&gt;
+</code></pre>
+<p>We have a script you can run from gfsh to start a Locator and Server in the simplest cluster:</p>
+<pre><code class="lang-shell"><span class="hljs-keyword">cd</span> spring-geode-workshop/configuration
+gfsh
+gfsh&gt;<span class="hljs-keyword">run</span> --<span class="hljs-keyword">file</span>=configuration/src/main/resources/geode/bin/start-simple-<span class="hljs-keyword">cluster</span>.gfsh
+</code></pre>
+<p>You are set to go.</p>
 <p>With our gemfire-cluster create with an two Apache Geode Locators and (Cache) Servers running we can verify by listing
 and describing the members:</p>
 <p><strong>List and Describe Members.</strong></p>
@@ -313,140 +248,82 @@ Server <span class="hljs-string">Bind              :</span> <span class="hljs-li
 Server <span class="hljs-string">Port              :</span> <span class="hljs-number">40404</span>
 <span class="hljs-string">Running                  :</span> <span class="hljs-literal">true</span>
 Client <span class="hljs-string">Connections       :</span> <span class="hljs-number">0</span>
-</code></pre><p>What happens if we try to run the application now?</p>
-<p><strong>RegionNotFoundException.</strong></p>
-<pre><code><span class="hljs-number">17</span>:<span class="hljs-number">42</span>:<span class="hljs-number">16.873</span> [main] ERROR o.s.b.SpringApplication - Application run failed
-java.lang.<span class="hljs-string">IllegalStateException:</span> Failed to execute ApplicationRunner
-    ...
-    at example.app.crm.CustomerServiceApplication.main(CustomerServiceApplication.<span class="hljs-string">java:</span><span class="hljs-number">51</span>) [classes/:?]
-Caused by: org.springframework.dao.<span class="hljs-string">DataAccessResourceFailureException:</span> remote server on <span class="hljs-number">10.99</span><span class="hljs-number">.199</span><span class="hljs-number">.24</span>(<span class="hljs-string">SpringBasedCacheClientApplication:</span><span class="hljs-number">68473</span>:loner):<span class="hljs-number">51142</span>:<span class="hljs-string">f9f4573d:</span><span class="hljs-string">SpringBasedCacheClientApplication:</span> While performing a remote query; nested exception is org.apache.geode.cache.client.<span class="hljs-string">ServerOperationException:</span> remote server on <span class="hljs-number">10.99</span><span class="hljs-number">.199</span><span class="hljs-number">.24</span>(<span class="hljs-string">SpringBasedCacheClientApplication:</span><span class="hljs-number">68473</span>:loner):<span class="hljs-number">51142</span>:<span class="hljs-string">f9f4573d:</span><span class="hljs-string">SpringBasedCacheClientApplication:</span> While performing a remote query
-    at org.springframework.data.gemfire.GemfireCacheUtils.convertGemfireAccessException(GemfireCacheUtils.<span class="hljs-string">java:</span><span class="hljs-number">230</span>) ~[spring-data-geode<span class="hljs-number">-2.0</span><span class="hljs-number">.14</span>.RELEASE.<span class="hljs-string">jar:</span><span class="hljs-number">2.0</span><span class="hljs-number">.14</span>.RELEASE]
-    at org.springframework.data.gemfire.GemfireAccessor.convertGemFireAccessException(GemfireAccessor.<span class="hljs-string">java:</span><span class="hljs-number">91</span>) ~[spring-data-geode<span class="hljs-number">-2.0</span><span class="hljs-number">.14</span>.RELEASE.<span class="hljs-string">jar:</span><span class="hljs-number">2.0</span><span class="hljs-number">.14</span>.RELEASE]
-    at org.springframework.data.gemfire.GemfireTemplate.find(GemfireTemplate.<span class="hljs-string">java:</span><span class="hljs-number">329</span>) ~[spring-data-geode<span class="hljs-number">-2.0</span><span class="hljs-number">.14</span>.RELEASE.<span class="hljs-string">jar:</span><span class="hljs-number">2.0</span><span class="hljs-number">.14</span>.RELEASE]
-    at org.springframework.data.gemfire.repository.support.SimpleGemfireRepository.count(SimpleGemfireRepository.<span class="hljs-string">java:</span><span class="hljs-number">129</span>) ~[spring-data-geode<span class="hljs-number">-2.0</span><span class="hljs-number">.14</span>.RELEASE.<span class="hljs-string">jar:</span><span class="hljs-number">2.0</span><span class="hljs-number">.14</span>.RELEASE]
-    ...
-    at example.app.crm.CustomerServiceApplication.lambda$runner$<span class="hljs-number">0</span>(CustomerServiceApplication.<span class="hljs-string">java:</span><span class="hljs-number">59</span>) ~[classes/:?]
-    at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:<span class="hljs-number">783</span>) ~[spring-boot<span class="hljs-number">-2.0</span><span class="hljs-number">.9</span>.RELEASE.<span class="hljs-string">jar:</span><span class="hljs-number">2.0</span><span class="hljs-number">.9</span>.RELEASE]
-    ... <span class="hljs-number">3</span> more
-Caused <span class="hljs-string">by:</span> org.apache.geode.cache.client.<span class="hljs-string">ServerOperationException:</span> remote server on <span class="hljs-number">10.99</span><span class="hljs-number">.199</span><span class="hljs-number">.24</span>(<span class="hljs-string">SpringBasedCacheClientApplication:</span><span class="hljs-number">68473</span>:loner):<span class="hljs-number">51142</span>:<span class="hljs-string">f9f4573d:</span><span class="hljs-string">SpringBasedCacheClientApplication:</span> While performing a remote query
-    at org.apache.geode.cache.client.internal.AbstractOp.processChunkedResponse(AbstractOp.<span class="hljs-string">java:</span><span class="hljs-number">352</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.QueryOp$QueryOpImpl.processResponse(QueryOp.java:<span class="hljs-number">170</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.AbstractOp.processResponse(AbstractOp.java:<span class="hljs-number">230</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.AbstractOp.attempt(AbstractOp.java:<span class="hljs-number">394</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.AbstractOp.attemptReadResponse(AbstractOp.java:<span class="hljs-number">203</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.ConnectionImpl.execute(ConnectionImpl.java:<span class="hljs-number">275</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.pooling.PooledConnection.execute(PooledConnection.java:<span class="hljs-number">332</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.OpExecutorImpl.executeWithPossibleReAuthentication(OpExecutorImpl.java:<span class="hljs-number">900</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.OpExecutorImpl.execute(OpExecutorImpl.java:<span class="hljs-number">158</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.OpExecutorImpl.execute(OpExecutorImpl.java:<span class="hljs-number">115</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.PoolImpl.execute(PoolImpl.java:<span class="hljs-number">763</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.QueryOp.execute(QueryOp.java:<span class="hljs-number">58</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.client.internal.ServerProxy.query(ServerProxy.java:<span class="hljs-number">70</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.query.internal.DefaultQuery.executeOnServer(DefaultQuery.java:<span class="hljs-number">456</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.query.internal.DefaultQuery.execute(DefaultQuery.java:<span class="hljs-number">338</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.springframework.data.gemfire.GemfireTemplate.find(GemfireTemplate.java:<span class="hljs-number">311</span>) ~[spring-data-geode<span class="hljs-number">-2.0</span><span class="hljs-number">.14</span>.RELEASE.<span class="hljs-string">jar:</span><span class="hljs-number">2.0</span><span class="hljs-number">.14</span>.RELEASE]
-    at org.springframework.data.gemfire.repository.support.SimpleGemfireRepository.count(SimpleGemfireRepository.<span class="hljs-string">java:</span><span class="hljs-number">129</span>) ~[spring-data-geode<span class="hljs-number">-2.0</span><span class="hljs-number">.14</span>.RELEASE.<span class="hljs-string">jar:</span><span class="hljs-number">2.0</span><span class="hljs-number">.14</span>.RELEASE]
-    ...
-    at example.app.crm.CustomerServiceApplication.lambda$runner$<span class="hljs-number">0</span>(CustomerServiceApplication.<span class="hljs-string">java:</span><span class="hljs-number">59</span>) ~[classes/:?]
-    at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:<span class="hljs-number">783</span>) ~[spring-boot<span class="hljs-number">-2.0</span><span class="hljs-number">.9</span>.RELEASE.<span class="hljs-string">jar:</span><span class="hljs-number">2.0</span><span class="hljs-number">.9</span>.RELEASE]
-    ... <span class="hljs-number">3</span> more
-Caused <span class="hljs-string">by:</span> org.apache.geode.cache.query.<span class="hljs-string">RegionNotFoundException:</span> Region not <span class="hljs-string">found:</span>  /Customers
-    at org.apache.geode.cache.query.internal.DefaultQuery.checkQueryOnPR(DefaultQuery.<span class="hljs-string">java:</span><span class="hljs-number">599</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.query.internal.DefaultQuery.execute(DefaultQuery.java:<span class="hljs-number">348</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.cache.query.internal.DefaultQuery.execute(DefaultQuery.java:<span class="hljs-number">319</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.internal.cache.tier.sockets.BaseCommandQuery.processQueryUsingParams(BaseCommandQuery.java:<span class="hljs-number">121</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.internal.cache.tier.sockets.BaseCommandQuery.processQuery(BaseCommandQuery.java:<span class="hljs-number">65</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.internal.cache.tier.sockets.command.Query.cmdExecute(Query.java:<span class="hljs-number">91</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.internal.cache.tier.sockets.BaseCommand.execute(BaseCommand.java:<span class="hljs-number">165</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.internal.cache.tier.sockets.ServerConnection.doNormalMsg(ServerConnection.java:<span class="hljs-number">791</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.internal.cache.tier.sockets.ServerConnection.doOneMessage(ServerConnection.java:<span class="hljs-number">922</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    at org.apache.geode.internal.cache.tier.sockets.ServerConnection.run(ServerConnection.java:<span class="hljs-number">1180</span>) ~[geode-core<span class="hljs-number">-1.2</span><span class="hljs-number">.1</span>.<span class="hljs-string">jar:</span>?]
-    ...
-</code></pre><p>The application fails to run because we (deliberately) did not create a corresponding, server-side, &quot;Customers&quot; Region.
-In order for a client to send data via a client <code>PROXY</code> Region (a Region with no local state) to a server in a cluster,
-at least one server in the cluster must have a matching Region by name (i.e. &quot;Customers&quot;).</p>
-<p>Indeed, there are no Regions in the cluster:</p>
-<p><strong>List Regions.</strong></p>
-<pre><code>gfsh&gt;<span class="hljs-keyword">list</span> regions
-<span class="hljs-keyword">No</span> Regions Found
-</code></pre><p>Of course, you could create the matching server-side, &quot;Customers&quot; Region using <em>Gfsh</em>:</p>
-<pre><code><span class="hljs-comment">gfsh</span>&gt;<span class="hljs-comment">create</span> <span class="hljs-comment">region</span> <span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-comment">name=Customers</span> <span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-comment">type=PARTITION</span>
-</code></pre><p>But, what if you have hundreds of application domain objects each requiring a Region for persistence? It is not an
-unusual or unreasonable requirement in any practical enterprise scale application.</p>
-<p>While it is not a &quot;convention&quot; in Spring Boot for Apache Geode (SBDG), Spring Data for Apache Geode (SDG) comes to
-our rescue. We simply only need to enable cluster configuration from the client:</p>
-<p><strong>Enable Cluster Configuration.</strong></p>
-<pre><code><span class="hljs-variable">@SpringBootApplication</span>
-<span class="hljs-variable">@EnableClusterAware</span>
-<span class="hljs-variable">@EnableEntityDefinedRegions</span>(basePackageClasses = Customer.class)    <span class="hljs-variable">@SpringBootApplication</span>
-public class CustomerServiceApplication {
-  <span class="hljs-comment">// ...</span>
-}
-</code></pre><p>SDG is careful not to stomp on existing Regions since those Regions may have data already. Declaring the
-@EnableClusterConfiguration` annotation is a useful development-time feature, but it is recommended that you
-explicitly define and declare your Regions in production environments, either using <em>Gfsh</em> or Spring confg.</p>
-<p>It is now possible to replace the SDG <code>@EnableClusterConfiguration</code> annotation with SBDG’s <code>@EnableClusterAware</code>
-annotation as you see above in the src code, which has the same effect of pushing configuration metadata from the
-client to the server (or cluster). Additionally, SBDG’s <code>@EnableClusterAware</code> annotation makes it unnecessary to
-explicitly have to configure parameters like <code>clientRegionShortcut</code> on the SDG <code>@EnableEntityDefinedRegions</code>
-annotation (or similar annotation, e.g. SDG’s <code>@EnableCachingDefinedRegions</code>). Finally, because the SBDG&#39;s<code>@EnableClusterAware</code> annotation is meta-annotated with SDG’s <code>@EnableClusterConfiguration annotation</code> is automatically
-configured with the <code>useHttp</code> attribute to <code>true</code>.</p>
-<p>Now, we can run our application again, and this time, it works!</p>
-<p><strong>Client/Server Run Successful.</strong></p>
-<pre><code>  .   ____          <span class="hljs-symbol">_</span>            <span class="hljs-symbol">__</span> <span class="hljs-symbol">_</span> <span class="hljs-symbol">_</span>
- /\\ / ___'<span class="hljs-symbol">_</span> <span class="hljs-symbol">__</span> <span class="hljs-symbol">_</span> <span class="hljs-symbol">_</span>(<span class="hljs-symbol">_</span>)<span class="hljs-symbol">_</span> <span class="hljs-symbol">__</span>  <span class="hljs-symbol">__</span> <span class="hljs-symbol">_</span> \ \ \ \
-( ( )\___ | '<span class="hljs-symbol">_</span> | '<span class="hljs-symbol">_</span>| | '<span class="hljs-symbol">_</span> \/ <span class="hljs-symbol">_</span>` | \ \ \ \
- \\/  ___)| |<span class="hljs-symbol">_</span>)| | | | | || (<span class="hljs-symbol">_</span>| |  ) ) ) )
-  '  |____| .<span class="hljs-symbol">__</span>|<span class="hljs-symbol">_</span>| |<span class="hljs-symbol">_</span>|<span class="hljs-symbol">_</span>| |<span class="hljs-symbol">_</span>\<span class="hljs-symbol">__</span>, | / / / /
- =========|<span class="hljs-symbol">_</span>|==============|___/=/<span class="hljs-symbol">_</span>/<span class="hljs-symbol">_</span>/<span class="hljs-symbol">_</span>/
- :: Spring Boot ::        (v2.0.9.RELEASE)
+</code></pre><p>What happens if we try to run the application now?  You will find that because we use a default locator
+port to connect to that our @EenableClusterAware annotation runs through logic that detects we are
+now in client / server mode and will automatically connect us to the cluster, create the region
+and persist our data into that regions.  If you have hundreds of application domain objects each
+requiring a Region for persistence SBDG will enable the creation of those regions in your behalf.
+It is not an unusual or unreasonable requirement in any practical enterprise scale application.</p>
+<p>SBG through its integration with Spring Data Gemfire (SDG) is careful not to stomp on existing Regions
+since those Regions may have data already. Declaring the @EnableClusterConfiguration` annotation,
+which @EnableClusterAware automatically turns on for usm, is a useful development-time feature, but
+it is recommended that you explicitly define and declare your Regions in production environments,
+either using <em>Gfsh</em> or Spring confg. One of the additional benefits of @EnableClusterAware
+annotation as you see above is that it will push configuration metadata from the client to the server (or cluster).
+[Note: Cluster Configuration is outside the scope of our lab but ensures the meta data is consistent across all
+nodes]</p>
+<p>@EnableClusterAware comes from the Spring Data Gemfire (SDG)  project. SDG’s <code>@EnableClusterAware</code>
+annotation makes it unnecessary to explicitly have to configure parameters like <code>clientRegionShortcut</code> on
+the SDG <code>@EnableEntityDefinedRegions</code> annotation (or similar annotation, e.g. SDG’s <code>@EnableCachingDefinedRegions</code>).
+Finally, because the SBDG&#39;s<code>@EnableClusterAware</code> annotation is meta-annotated with SDG’s <code>@EnableClusterConfiguration
+annotation</code> is automatically configured with the <code>useHttp</code> attribute to <code>true</code>.</p>
+<p>Now, we can run our application again, and this time, you will see you region created on the server you just
+launched and can query for data. it just works!</p>
+<p><strong>Client/Server Run </strong></p>
+<pre><code class="lang-bash">.   ____          <span class="hljs-symbol">_</span>            <span class="hljs-symbol">__</span> <span class="hljs-symbol">_</span> <span class="hljs-symbol">_</span>
+     /\\ / ___'<span class="hljs-symbol">_</span> <span class="hljs-symbol">__</span> <span class="hljs-symbol">_</span> <span class="hljs-symbol">_</span>(<span class="hljs-symbol">_</span>)<span class="hljs-symbol">_</span> <span class="hljs-symbol">__</span>  <span class="hljs-symbol">__</span> <span class="hljs-symbol">_</span> \ \ \ \
+    ( ( )\___ | '<span class="hljs-symbol">_</span> | '<span class="hljs-symbol">_</span>| | '<span class="hljs-symbol">_</span> \/ <span class="hljs-symbol">_</span>` | \ \ \ \
+     \\/  ___)| |<span class="hljs-symbol">_</span>)| | | | | || (<span class="hljs-symbol">_</span>| |  ) ) ) )
+      '  |____| .<span class="hljs-symbol">__</span>|<span class="hljs-symbol">_</span>| |<span class="hljs-symbol">_</span>|<span class="hljs-symbol">_</span>| |<span class="hljs-symbol">_</span>\<span class="hljs-symbol">__</span>, | / / / /
+     =========|<span class="hljs-symbol">_</span>|==============|___/=/<span class="hljs-symbol">_</span>/<span class="hljs-symbol">_</span>/<span class="hljs-symbol">_</span>/
+     :: Spring Boot ::        (v2.0.9.RELEASE)
 
-Saving Customer [Customer(name=Jon Doe)]
-Querying <span class="hljs-keyword">for</span> Customer [SELECT * FROM /Customers WHERE name LIKE '%Doe']
-Customer was [Customer(name=Jon Doe)]
+    Saving Customer [Customer(name=Jon Doe)]
+    Querying <span class="hljs-keyword">for</span> Customer [SELECT * FROM /Customers WHERE name LIKE '%Doe']
+    Customer was [Customer(name=Jon Doe)]
 
-Process finished with exit code <span class="hljs-number">0</span>
-</code></pre><p>In the cluster (server-side), we will also see that the &quot;Customers&quot; Region was created successfully:</p>
+    Process finished with exit code <span class="hljs-number">0</span>
+</code></pre>
+<p>In the cluster (server-side), we will also see that the &quot;Customers&quot; Region was created successfully:</p>
 <p><strong>List &amp; Describe Regions.</strong></p>
-<pre><code>gfsh&gt;list regions
-List <span class="hljs-keyword">of</span> regions
----------------
-Customers
+<pre><code class="lang-bash">    gfsh&gt;list regions
+    List <span class="hljs-keyword">of</span> regions
+    ---------------
+    Customers
 
 
-gfsh&gt;describe region --name=/Customers
-..........................................................
-Name            : Customers
-Data Policy     : partition
-Hosting Members : ServerOne
+    gfsh&gt;describe region --name=/Customers
+    ..........................................................
+    Name            : Customers
+    Data Policy     : partition
+    Hosting Members : ServerOne
 
-Non-Default Attributes Shared By Hosting Members
+    Non-Default Attributes Shared By Hosting Members
 
- Type  |    Name     | Value
------- | ----------- | ---------
-Region | size        | <span class="hljs-number">1</span>
-       | data-policy | PARTITION
-</code></pre><p>We see that the &quot;Customers&quot; Region has a size of 1, containing &quot;Jon Doe&quot;.</p>
+     Type  |    Name     | Value
+    ------ | ----------- | ---------
+    Region | size        | <span class="hljs-number">1</span>
+           | data-policy | PARTITION
+</code></pre>
+<p>We see that the &quot;Customers&quot; Region has a size of 1, containing &quot;Jon Doe&quot;.</p>
 <p>We can verify this by querying the &quot;Customers&quot; Region:</p>
 <p><strong>Query for all Customers.</strong></p>
-<pre><code>gfsh&gt;query --query="SELECT customer.name FROM /Customers customer"
-Result : true
-Limit  : 100
-Rows   : 1
+<pre><code class="lang-bash">    gfsh&gt;query <span class="hljs-comment">--query="SELECT customer.name FROM /Customers customer"</span>
+    Result : <span class="hljs-type">true</span>
+    Limit  : 100
+    Rows   : 1
 
-<span class="hljs-section">Result
--------</span>
-Jon Doe
-</code></pre><p>That was easy!</p>
+    Result
+    <span class="hljs-comment">-------</span>
+    Jon Doe
+</code></pre>
+<p>That was easy!</p>
 <h2 id="auto-configuration-for-apache-geode-take-two">Auto-configuration for Apache Geode, Take Two</h2>
 <p>What may not be apparent in this example up to this point is how the data got from the client to the server. Certainly,
 our client did send <code>Jon Doe</code> to the server, but our <code>Customer</code> class is not <code>java.io.Serializable</code>. So, how was an
 instance of <code>Customer</code> streamed and sent from the client to the server then (it is using a Socket)?</p>
-<p>Any object sent over a network, between two Java processes, or streamed to/from disk, must be serializable,
-no exceptions!</p>
-<p>Furthermore, when we started the cluster, we did not include any application domain classes on the classpath
-of any server in the cluster.</p>
-<p>As further evidence, we an adjust our query slightly:</p>
+<p>Any object sent over a network, between two Java processes, or streamed to/from disk, must be serializable.</p>
+<p>As further evidence, we can adjust our query slightly:</p>
 <p><strong>Invalid Query.</strong></p>
 <pre><code>gfsh&gt;query --query=<span class="hljs-string">"SELECT * FROM /Customers"</span>
 Message<span class="hljs-keyword"> :</span> Could<span class="hljs-built_in"> not </span>create an<span class="hljs-built_in"> instance </span>of a class example.app.crm.model.Customer
@@ -458,7 +335,7 @@ Message<span class="hljs-keyword"> :</span> Could<span class="hljs-built_in"> no
 Result <span class="hljs-keyword"> :</span> false
 </code></pre><p>So, how was the data sent then? How were we able to access the data stored in the server(s) on the cluster with the
 OQL query <code>SELECT customer.name FROM /Customers customer</code> as seen above?</p>
-<p>Well, Apache Geode and Pivotal GemFire provide 2 proprietary serialization formats in addition to <em>Java Serialization</em>:
+<p>Apache Geode and Tanzu GemFire provide 2 proprietary serialization formats in addition to <em>Java Serialization</em>:
 {apache-geode-docs}/developing/data_serialization/gemfire_data_serialization.html[Data Serialization]
 and {apache-geode-docs}/developing/data_serialization/gemfire_pdx_serialization.html[PDX], or <em>Portable Data Exchange</em>.</p>
 <p>While <em>Data Serialization</em> is more efficient, PDX is more flexible (i.e. &quot;portable&quot;). PDX enables data to be queried
@@ -471,9 +348,6 @@ application domain model types to make them <code>Serializable</code>, such as w
 all application domain model types.</p>
 <p>If we were to disable PDX <em>auto-configuration</em>, you would see the effects of trying to serialize a non-serializable type,
 <code>Customer</code>.  This would be apparent when you tried to query /Customers. We will leave this as an exercise for the student. </p>
-<p>SBDG takes care of all your serialization needs without you having to configure serialization or implement
-<code>java.io.Serializable</code> in all your application domain model types, including types your application domain model types
-might refer to, which may not be possible.</p>
 <p>If you were not using SBDG, then you would need to enable PDX serialization explicitly.</p>
 <p>The Spring Boot Data Geode/Gemfire PDX <em>auto-configuration</em> provided by SBDG is equivalent to:</p>
 <p><strong>Equivalent PDX Configuration with Spring Data Gemfire.</strong></p>

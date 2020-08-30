@@ -82,7 +82,8 @@ public class CustomerServiceApplication {
 			assertThat(randomCustomer.getName()).isEqualTo(person.fullName());
 			assertThat(customerRepository.count()).isEqualTo(randomCustomer.getId());
 
-			String query = "Querying for Customer [SELECT * FROM /Customers WHERE name LIKE " + randomCustomer.getName() + "]";
+			String query = "Querying for Customer [SELECT * FROM /Customers WHERE name LIKE " 
+			+ randomCustomer.getName() + "]";
 			System.err.println(query);
 
 			Customer queriedrandomCustomer = customerRepository.findByNameLike(person.fullName());
