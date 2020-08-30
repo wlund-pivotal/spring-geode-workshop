@@ -43,21 +43,9 @@ import io.codearte.jfairy.producer.person.Person;
  * @since 1.0.0
  */
 // tag::class[]
-/***/
 @SpringBootApplication
 @EnableClusterAware
 @EnableEntityDefinedRegions(basePackageClasses = Customer.class)
-
-/**
- * 
- * @author wlund
- * Without AutoConfiguration
-@SpringBootApplication(exclude = ClientCacheAutoConfiguration.class)
-@EnableEntityDefinedRegions(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
-/**Disabling Spring Data Repositories Auto-configuration.**
- @SpringBootApplication(exclude = RepositoriesAutoConfiguration.class)
-@EnableEntityDefinedRegions(basePackageClasses = Customer.class, clientRegionShortcut = ClientRegionShortcut.LOCAL)
-*/
 public class CustomerServiceApplication {
 
 	public static void main(String[] args) {
@@ -83,25 +71,25 @@ public class CustomerServiceApplication {
 			
 			assertThat(customerRepository.count()).isEqualTo(id);
 
-			Customer jonDoe = Customer.newCustomer(id + 1L, person.fullName());
+			Customer randomCustomer = Customer.newCustomer(id + 1L, person.fullName());
 
-			System.err.printf("Saving Customer [%s]%n", jonDoe);
+			System.err.printf("Saving Customer [%s]%n", randomCustomer);
 
-			jonDoe = customerRepository.save(jonDoe);
+			randomCustomer = customerRepository.save(randomCustomer);
 
-			assertThat(jonDoe).isNotNull();
-			assertThat(jonDoe.getId()).isEqualTo(id + 1);
-			assertThat(jonDoe.getName()).isEqualTo(person.fullName());
-			assertThat(customerRepository.count()).isEqualTo(jonDoe.getId());
+			assertThat(randomCustomer).isNotNull();
+			assertThat(randomCustomer.getId()).isEqualTo(id + 1);
+			assertThat(randomCustomer.getName()).isEqualTo(person.fullName());
+			assertThat(customerRepository.count()).isEqualTo(randomCustomer.getId());
 
-			String query = "Querying for Customer [SELECT * FROM /Customers WHERE name LIKE " + jonDoe.getName() + "]";
+			String query = "Querying for Customer [SELECT * FROM /Customers WHERE name LIKE " + randomCustomer.getName() + "]";
 			System.err.println(query);
 
-			Customer queriedJonDoe = customerRepository.findByNameLike(person.fullName());
+			Customer queriedrandomCustomer = customerRepository.findByNameLike(person.fullName());
 
-			assertThat(queriedJonDoe).isEqualTo(jonDoe);
+			assertThat(queriedrandomCustomer).isEqualTo(randomCustomer);
 
-			System.err.printf("Customer was [%s]%n", queriedJonDoe);
+			System.err.printf("Customer was [%s]%n", queriedrandomCustomer);
 		};
 	}
 }

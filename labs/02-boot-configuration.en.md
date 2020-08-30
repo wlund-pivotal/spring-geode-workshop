@@ -171,7 +171,9 @@ mvn clean package`
 ```
 Then run the `CustomerServiceApplication` class from the command-line using the command 
 
-`$ mvn spring-boot:run`
+```bash
+$ mvn spring-boot:run
+```
 
 We have just run our application taking advantage of SBDG to automatically detect that we are in local mode
 with no connection to a gemfire cluster.  SBDG will create our region for us in memory and store our data

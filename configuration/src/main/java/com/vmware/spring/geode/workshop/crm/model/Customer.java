@@ -64,10 +64,6 @@ public class Customer<T> {
 		return "Customer(" + this.id + ", " + this.name + ")";
 	}
 
-	protected boolean canEqual(Object other) {
-		return other instanceof Customer;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

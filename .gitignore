@@ -12,6 +12,9 @@ ServerOne/
 
 .gradle
 .springBeans
+*.*#
+*.bin
+*.lock
 *.iml
 *.ipr
 *.iws
