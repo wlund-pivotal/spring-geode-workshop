@@ -67,7 +67,7 @@ gemfire1   2/2        1/2
 ##  Start the Tanzu GemFire Shell (GFSH)
 
 ```bash
-kubectl  exec -it gemfire-locator-0 -- gfsh
+kubectl  exec -it gemfire1-locator-0 -- gfsh
 ```
 ## Connect to the Tanzu GemFire cluster
 
@@ -77,9 +77,26 @@ Once GFSH is running, we need to connect to the GemFire cluster through the foll
 gfsh>connect
 ```
 
-and to see the topology and configuraton of your clustter you can do the following:
+and to see the topology and configuraton of your cluster you can do the following:
+
+```bash
+k9s
+```
+
+Then when all the nodes are up you can check the members as you did in your local lab with the list members cmd:
 
 ```bash
 gfsh>list members
+
+Member Count : 4
+
+       Name        | Id
+------------------ | -----------------------------------------------------------
+
+
+gemfire1-locator-0 | 10.244.0.7(gemfire1-locator-0:1:locator)<ec><v0>:41000 [C..
+gemfire1-locator-1 | 10.244.0.9(gemfire1-locator-1:1:locator)<ec><v1>:41000
+gemfire1-server-0  | 10.244.0.11(gemfire1-server-0:1)<v2>:41000
+gemfire1-server-1  | 10.24
 ```
 

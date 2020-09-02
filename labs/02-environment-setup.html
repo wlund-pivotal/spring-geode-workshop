@@ -2,48 +2,70 @@
 <h2 id="create-gemfire-cluster">Create Gemfire Cluster</h2>
 <p>We are going to work in the default namespace. There is a more complete example that can be found with the docs at
 <a href="https://tgf.docs.pivotal.io/tgf/beta/create-and-delete.html">VMware Tanzu Gemfire</a> where the first step is
-to create a gemfire-cluster namespace.  Alsom In our simplified approach we will not use security.</p>
+to create a gemfire-cluster namespace.  </p>
 <h2 id="apply-the-crd-for-your-tanzu-gemfire-cluster-as-in-this-development-environment-example-">Apply the CRD for your Tanzu GemFire cluster, as in this development environment example:</h2>
-<pre><code class="lang-bash">$ cat &lt;&lt; EOF | kubectl -n gemfire-cluster apply -f -
+<pre><code class="lang-bash">$ cat &lt;&lt; EOF | kubectl  apply -f -
 <span class="hljs-attr">apiVersion:</span> core.geode.apache.org/v1alpha1
 <span class="hljs-attr">kind:</span> GeodeCluster
 <span class="hljs-attr">metadata:</span>
 <span class="hljs-attr">  name:</span> gemfire1
 <span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  exposeExternalManagement:</span> <span class="hljs-literal">true</span>
 <span class="hljs-attr">  locators:</span>
-<span class="hljs-attr">    replicas:</span> <span class="hljs-number">2</span>
+<span class="hljs-attr">    replicas:</span> <span class="hljs-number">1</span>
 <span class="hljs-attr">  servers:</span>
 <span class="hljs-attr">    replicas:</span> <span class="hljs-number">2</span>
 EOF
 </code></pre>
 <p>or you can simply create a yaml file from the contents like gemfire-cluster.yaml:</p>
-<pre><code class="lang-yaml"><span class="hljs-symbol">apiVersion:</span> core.geode.apache.org/v1alpha1
-<span class="hljs-symbol">kind:</span> GeodeCluster
-<span class="hljs-symbol">metadata:</span>
-<span class="hljs-symbol">  name:</span> gemfire1
-<span class="hljs-symbol">spec:</span>
-<span class="hljs-symbol">  locators:</span>
-<span class="hljs-symbol">    replicas:</span> <span class="hljs-number">2</span>
-<span class="hljs-symbol">  servers:</span>
-<span class="hljs-symbol">    replicas:</span> <span class="hljs-number">2</span>
+<pre><code class="lang-yaml"><span class="hljs-attr">apiVersion:</span> core.geode.apache.org/v1alpha1
+<span class="hljs-attr">kind:</span> GeodeCluster
+<span class="hljs-attr">metadata:</span>
+<span class="hljs-attr">  name:</span> gemfire1
+<span class="hljs-attr">spec:</span>
+<span class="hljs-attr">  exposeExternalManagement:</span> <span class="hljs-literal">true</span>
+<span class="hljs-attr">  locators:</span>
+<span class="hljs-attr">    replicas:</span> <span class="hljs-number">1</span>
+<span class="hljs-attr">  servers:</span>
+<span class="hljs-attr">    replicas:</span> <span class="hljs-number">2</span>
 </code></pre>
 <p>and create the gemfire-cluster with the following command:</p>
-<pre><code class="lang-bash">kubectl apply <span class="hljs-_">-f</span> gemfire-cluster.yaml
+<pre><code class="lang-bash">kubectl apply -f gemfire-cluster.yaml
+
+You can watch <span class="hljs-keyword">the</span> progress <span class="hljs-keyword">of</span>  your gemfire-cluster deployment <span class="hljs-keyword">by</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">a</span> utility called k9s.  From <span class="hljs-keyword">the</span> <span class="hljs-keyword">command</span> <span class="hljs-title">line</span> <span class="hljs-title">type</span>:
+
+```bash
+k9s
 </code></pre>
-<h2 id="check-the-creation-status-of-the-tanzu-gemfire-cluster-">check the creation status of the Tanzu GemFire cluster:</h2>
+<p>and you&#39;ll see the status of the nodes in your cluster and will be able to tell when all nodes are running. </p>
+<h2 id="check-the-creation-status-of-the-tanzu-gemfire-cluster-">Check the creation status of the Tanzu GemFire cluster:</h2>
 <pre><code class="lang-bash"> kubectl  <span class="hljs-keyword">get</span> GeodeClusters
 </code></pre>
 <p>and you should see an output that looks similar to this:</p>
 <pre><code class="lang-bash">NAME       LOCATORS   SERVERS
 gemfire1   <span class="hljs-number">2</span>/<span class="hljs-number">2</span>        <span class="hljs-number">1</span>/<span class="hljs-number">2</span>
 </code></pre>
-<h2 id="connect-to-the-tanzu-gemfire-cluster">Connect to the Tanzu GemFire Cluster</h2>
-<pre><code class="lang-bash">kubectl  exec -<span class="hljs-keyword">it</span> gemfire-locator<span class="hljs-number">-0</span> <span class="hljs-comment">-- gfsh</span>
+<h2 id="start-the-tanzu-gemfire-shell-gfsh-">Start the Tanzu GemFire Shell (GFSH)</h2>
+<pre><code class="lang-bash">kubectl  exec -<span class="hljs-keyword">it</span> gemfire1-locator<span class="hljs-number">-0</span> <span class="hljs-comment">-- gfsh</span>
 </code></pre>
-<h2 id="verify-gemfire-is-working">Verify Gemfire is working</h2>
-<p>Since the cluster is deployed for us we need only connect. Do the following:</p>
+<h2 id="connect-to-the-tanzu-gemfire-cluster">Connect to the Tanzu GemFire cluster</h2>
+<p>Once GFSH is running, we need to connect to the GemFire cluster through the following command:</p>
 <pre><code class="lang-bash">gfsh&gt;<span class="hljs-built_in">connect</span>
 </code></pre>
-<p>and to see the topology and configuraton of your clustter you can do the following:</p>
-<pre><code class="lang-bash">gfsh&gt;<span class="hljs-built_in">list</span> <span class="hljs-built_in">members</span>
+<p>and to see the topology and configuraton of your cluster you can do the following:</p>
+<pre><code class="lang-bash">k9s
+</code></pre>
+<p>Then when all the nodes are up you can check the members as you did in your local lab with the list members cmd:</p>
+<pre><code class="lang-bash">gfsh&gt;list members
+
+Member Count : 4
+
+       Name        | Id
+------------------ | -----------------------------------------------------------
+
+
+gemfire1-locator<span class="hljs-string">-0</span> | 10.244.0.7(gemfire1-locator<span class="hljs-string">-0</span>:1:locator)&lt;ec&gt;&lt;v0&gt;:41000 [C..
+gemfire1-locator<span class="hljs-string">-1</span> | 10.244.0.9(gemfire1-locator<span class="hljs-string">-1</span>:1:locator)&lt;ec&gt;&lt;v1&gt;:41000
+gemfire1-server<span class="hljs-string">-0</span>  | 10.244.0.11(gemfire1-server<span class="hljs-string">-0</span>:1)&lt;v2&gt;:41000
+gemfire1-server<span class="hljs-string">-1</span>  | 10.24
 </code></pre>

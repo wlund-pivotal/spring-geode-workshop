@@ -2,14 +2,16 @@
 
 This repo contains provides an example application demonstrating the use of
 Tanzu GemFire as a [look-aside cache](https://content.pivotal.io/blog/an-introduction-to-look-aside-vs-inline-caching-patterns).
+With whatever your chosen IDE tool or editor is you will import an existing gradle project.  Follow similar steps as Lab 1
+to import the project if you're using an IDE. 
 
 The application uses [Spring Boot for Apache Geode](https://docs.spring.io/autorepo/docs/spring-boot-data-geode-build/current/reference/html5/)
 to cache data from the Bikewise.org public REST API. Look-aside caching is enabled with just a few annotations. When serving cached data,
 the application response time is dramatically improved.
 
 # How to get the app running on the local Env. 
-We are going to work now with an application that will use the look-aside features of gemfire caching.  A standard spring-mvc app employs the use
-of stereotypes.  These include:
+We are going to work now with an application that will use the look-aside features of gemfire caching.  A standard spring-mvc
+app employs the use of stereotypes.  These include:
 
 - Domain Model
 - Java DSL for Configuration
@@ -17,8 +19,8 @@ of stereotypes.  These include:
 - View Controllers
 - Spring MVC
 
-The web MVC framework we are using is Thyme Leaf but will not be covered in this workshop. We will only look at the java code involved in the integration
-of Spring Boot Data Gemfire. Let's start with the domain.
+The web MVC framework we are using is Thyme Leaf but will not be covered in this workshop. We will only look at the java code
+involved in the integration of Spring Boot Data Gemfire. Let's start with the domain.
 
 ## Domain Object
 Our domain is examining reports on incidents that effect bikes within a grouping nearby and associated with a zipcode.  Our BikeIncident is structure to
@@ -158,24 +160,31 @@ You should now be able to run your BikeIncident app locally with a local cache. 
 from your IDE or commandline.
 
 ```bash
-gfsh>start locator
-gfsh>configure pdx --read-serialized=true
-gfsh>start server
+
+gfsh>run --file=configuration/src/main/resources/geode/bin/start-simple-cluster.gfsh
 ```
+
 Now run some queries on zip codes and do the following query:
 ```bash
 gfsh>query --query="SELECT address, description FROM /BikeIncidentsByZip"
 ```
 
-#Section Two - deploying our application to Kubernetes
-The fist thing we need to do is change our default profile from "default" to kubernetes, allowing us to retrieve our gemfire-cluster locators and servers
-to connect to.
+# Section Two - deploying our application to Kubernetes
+The fist thing we need to do is change our default profile from "default" to kubernetes, allowing us to retrieve our gemfire-cluster
+locators and servers to connect to.
 
-Open application.properties and uncomment the spring.profiles.active=kubernetes.  This will pick up the additional properties we need for the gemfire
-cluster when we deploy our image.
+Open application.properties and uncomment the spring.profiles.active=kubernetes.  This will pick up the additional properties we
+need for the gemfire cluster when we deploy our image.
+
+If  you are still in your IDE stop the spring boot process we just executed and exit gfsh in the following way:
+
+```bash
+gfsh>shutdown --include-locators=true
+```
 
 ## 1.  Build the image
-Starting with Spring Boot 2.3, you can now run a comand and your build tool (maven or gradle) will build the Docker file for you.  For this application if you run:
+Starting with Spring Boot 2.3, you can now run a comand and your build tool (maven or gradle) will build the Docker file for you.
+For this application if you run:
 
 ```bash
 ./gradlew bootBuildImage

@@ -1,10 +1,14 @@
 <h1 id="look-aside-cache-pattern-example">Look-aside Cache Pattern Example</h1>
 <p>This repo contains provides an example application demonstrating the use of
-Tanzu GemFire as a <a href="https://content.pivotal.io/blog/an-introduction-to-look-aside-vs-inline-caching-patterns">look-aside cache</a>.</p>
-<p>The application uses <a href="https://docs.spring.io/autorepo/docs/spring-boot-data-geode-build/current/reference/html5/">Spring Boot for Apache Geode</a> to cache data from the Bikewise.org public REST API. Look-aside caching is enabled with just a few annotations. When serving cached data, the application response time is dramatically improved.</p>
+Tanzu GemFire as a <a href="https://content.pivotal.io/blog/an-introduction-to-look-aside-vs-inline-caching-patterns">look-aside cache</a>.
+With whatever your chosen IDE tool or editor is you will import an existing gradle project.  Follow similar steps as Lab 1
+to import the project if you&#39;re using an IDE. </p>
+<p>The application uses <a href="https://docs.spring.io/autorepo/docs/spring-boot-data-geode-build/current/reference/html5/">Spring Boot for Apache Geode</a>
+to cache data from the Bikewise.org public REST API. Look-aside caching is enabled with just a few annotations. When serving cached data,
+the application response time is dramatically improved.</p>
 <h1 id="how-to-get-the-app-running-on-the-local-env-">How to get the app running on the local Env.</h1>
-<p>We are going to work now with an application that will use the look-aside features of gemfire caching.  A standard spring-mvc app employs the use
-of stereotypes.  These include:</p>
+<p>We are going to work now with an application that will use the look-aside features of gemfire caching.  A standard spring-mvc
+app employs the use of stereotypes.  These include:</p>
 <ul>
 <li>Domain Model</li>
 <li>Java DSL for Configuration</li>
@@ -12,8 +16,8 @@ of stereotypes.  These include:</p>
 <li>View Controllers</li>
 <li>Spring MVC</li>
 </ul>
-<p>The web MVC framework we are using is Thyme Leaf but will not be covered in this workshop. We will only look at the java code involved in the integration
-of Spring Boot Data Gemfire. Let&#39;s start with the domain.</p>
+<p>The web MVC framework we are using is Thyme Leaf but will not be covered in this workshop. We will only look at the java code
+involved in the integration of Spring Boot Data Gemfire. Let&#39;s start with the domain.</p>
 <h2 id="domain-object">Domain Object</h2>
 <p>Our domain is examining reports on incidents that effect bikes within a grouping nearby and associated with a zipcode.  Our BikeIncident is structure to
 capture a description of an incident.  Copy and paste this code into the <em>BikeIncident</em> class in the domain package.</p>
@@ -136,20 +140,23 @@ zipcode parameter that is input into our search page.</p>
 <h2 id="testing-your-application-functionality-locally">Testing your application functionality locally</h2>
 <p>You should now be able to run your BikeIncident app locally with a local cache.  Simply start the spring boot application <em>LookAsideCacheApplication</em>
 from your IDE or commandline.</p>
-<pre><code class="lang-bash">gfsh&gt;<span class="hljs-literal">start</span> locator
-gfsh&gt;configure pdx --<span class="hljs-attr">read-serialized=</span><span class="hljs-literal">true</span>
-gfsh&gt;<span class="hljs-literal">start</span> server
+<pre><code class="lang-bash">
+gfsh&gt;run --<span class="hljs-keyword">file</span>=configuration<span class="hljs-regexp">/src/m</span>ain<span class="hljs-regexp">/resources/g</span>eode<span class="hljs-regexp">/bin/</span>start-simple-cluster.gfsh
 </code></pre>
 <p>Now run some queries on zip codes and do the following query:</p>
 <pre><code class="lang-bash">gfsh&gt;<span class="hljs-keyword">query</span> --<span class="hljs-keyword">query</span>=<span class="hljs-string">"SELECT address, description FROM /BikeIncidentsByZip"</span>
 </code></pre>
-<p>#Section Two - deploying our application to Kubernetes
-The fist thing we need to do is change our default profile from &quot;default&quot; to kubernetes, allowing us to retrieve our gemfire-cluster locators and servers
-to connect to.</p>
-<p>Open application.properties and uncomment the spring.profiles.active=kubernetes.  This will pick up the additional properties we need for the gemfire
-cluster when we deploy our image.</p>
+<h1 id="section-two-deploying-our-application-to-kubernetes">Section Two - deploying our application to Kubernetes</h1>
+<p>The fist thing we need to do is change our default profile from &quot;default&quot; to kubernetes, allowing us to retrieve our gemfire-cluster
+locators and servers to connect to.</p>
+<p>Open application.properties and uncomment the spring.profiles.active=kubernetes.  This will pick up the additional properties we
+need for the gemfire cluster when we deploy our image.</p>
+<p>If  you are still in your IDE stop the spring boot process we just executed and exit gfsh in the following way:</p>
+<pre><code class="lang-bash">gfsh&gt;<span class="hljs-built_in">shutdown</span> --include-locators=<span class="hljs-literal">true</span>
+</code></pre>
 <h2 id="1-build-the-image">1.  Build the image</h2>
-<p>Starting with Spring Boot 2.3, you can now run a comand and your build tool (maven or gradle) will build the Docker file for you.  For this application if you run:</p>
+<p>Starting with Spring Boot 2.3, you can now run a comand and your build tool (maven or gradle) will build the Docker file for you.
+For this application if you run:</p>
 <pre><code class="lang-bash">./gradlew bootBuildImage
 </code></pre>
 <p>This creates an image for you on your local docker daemon.</p>

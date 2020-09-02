@@ -10,6 +10,9 @@ ServerOne/
 */wrapper/
 */daemon/
 
+initial-gemfire-look-aside-cache/daemon/6.6/registry.bin
+initial-gemfire-look-aside-cache/daemon/6.6/registry.bin.lock
+
 .gradle
 .springBeans
 *.*#

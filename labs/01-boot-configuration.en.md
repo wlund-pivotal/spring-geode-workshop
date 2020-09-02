@@ -234,7 +234,7 @@ adding:
 ```
 but in most case there is an easier way to move from a local ClientCache to a Client/Server Topology.
 
-Without *auto-configuration* settin gup and runnning this quickly would not be possible. SBDG assumes
+Without *auto-configuration* setting up and runnning this quickly would not be possible. SBDG assumes
 standard practices for the gemfire developer to be able to begin being productive immediately when using
 Spring Boot
 
@@ -318,7 +318,7 @@ and describing the members:
     Client Connections       : 0
 
 What happens if we try to run the application now?  You will find that because we use a default locator
-port to connect to that our @EenableClusterAware annotation runs through logic that detects we are
+port to connect to that our @EnableClusterAware annotation runs through logic that detects we are
 now in client / server mode and will automatically connect us to the cluster, create the region
 and persist our data into that regions.  If you have hundreds of application domain objects each
 requiring a Region for persistence SBDG will enable the creation of those regions in your behalf.
@@ -409,25 +409,8 @@ What may not be apparent in this example up to this point is how the data got fr
 our client did send `Jon Doe` to the server, but our `Customer` class is not `java.io.Serializable`. So, how was an
 instance of `Customer` streamed and sent from the client to the server then (it is using a Socket)?
 
-Any object sent over a network, between two Java processes, or streamed to/from disk, must be serializable.
-
-As further evidence, we can adjust our query slightly:
-
-**Invalid Query.**
-
-    gfsh>query --query="SELECT * FROM /Customers"
-    Message : Could not create an instance of a class example.app.crm.model.Customer
-    Result  : false
-
-If you tried to perform a `get`, you would hit a similar error:
-
-**Region.get(key).**
-
-    gfsh>get --region=/Customers --key=1 --key-class=java.lang.Long
-    Message : Could not create an instance of a class example.app.crm.model.Customer
-    Result  : false
-
-So, how was the data sent then? How were we able to access the data stored in the server(s) on the cluster with the
+Any object sent over a network, between two Java processes, or streamed to/from disk, must be serializable. So, how was the data
+serialized then? How were we able to access the data stored in the server(s) on the cluster with the
 OQL query `SELECT customer.name FROM /Customers customer` as seen above?
 
 Apache Geode and Tanzu GemFire provide 2 proprietary serialization formats in addition to *Java Serialization*:
@@ -452,7 +435,7 @@ If you were not using SBDG, then you would need to enable PDX serialization expl
 
 The Spring Boot Data Geode/Gemfire PDX *auto-configuration* provided by SBDG is equivalent to:
 
-**Equivalent PDX Configuration with Spring Data Gemfire.**
+**Equivalent PDX Configuration with Spring Data Gemfire that Spring Boot Data Gemfire builds upon.**
 
     @SpringBootApplication
     @ClientCacheApplication
