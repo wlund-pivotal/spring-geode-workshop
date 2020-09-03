@@ -42,6 +42,7 @@ and create the gemfire-cluster with the following command:
 
 ```bash
 kubectl apply -f gemfire-cluster.yaml
+```
 
 You can watch the progress of  your gemfire-cluster deployment by using a utility called k9s.  From the command line type:
 
@@ -61,7 +62,7 @@ and you should see an output that looks similar to this:
 
 ```bash
 NAME       LOCATORS   SERVERS
-gemfire1   2/2        1/2
+gemfire1   1/1        2/2
 ```
 
 ##  Start the Tanzu GemFire Shell (GFSH)
@@ -88,14 +89,13 @@ Then when all the nodes are up you can check the members as you did in your loca
 ```bash
 gfsh>list members
 
-Member Count : 4
+Member Count : 3
 
        Name        | Id
 ------------------ | -----------------------------------------------------------
 
 
 gemfire1-locator-0 | 10.244.0.7(gemfire1-locator-0:1:locator)<ec><v0>:41000 [C..
-gemfire1-locator-1 | 10.244.0.9(gemfire1-locator-1:1:locator)<ec><v1>:41000
 gemfire1-server-0  | 10.244.0.11(gemfire1-server-0:1)<v2>:41000
 gemfire1-server-1  | 10.24
 ```
